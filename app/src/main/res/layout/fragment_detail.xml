@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/detail_view_layout_margin">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/movieDetail_title"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:paddingBottom="@dimen/detail_view_layout_margin"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/movieDetail_thumbnail"
+            android:layout_below="@id/movieDetail_title"
+            android:layout_alignParentLeft="true"/>
+
+        <LinearLayout
+            android:id="@+id/movieDetail_ratingReleaseLayout"
+            android:layout_width="@dimen/grid_image_view_movie_width"
+            android:layout_height="@dimen/grid_image_view_movie_height"
+            android:orientation="vertical"
+            android:layout_toRightOf="@id/movieDetail_thumbnail"
+            android:layout_below="@id/movieDetail_title"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/movieDetail_rating"
+                android:layout_toRightOf="@id/movieDetail_thumbnail"
+                android:layout_below="@id/movieDetail_title"
+                android:textStyle="italic"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/movieDetail_releaseDate"
+                android:layout_below="@id/movieDetail_rating"
+                android:layout_toRightOf="@id/movieDetail_thumbnail"
+                android:textStyle="italic"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/movieDetail_overview"
+            android:layout_below="@id/movieDetail_thumbnail"
+            android:layout_alignParentLeft="true"
+            android:paddingTop="@dimen/detail_view_layout_margin"/>
+
+
+    </RelativeLayout>
+</ScrollView>

@@ -1,0 +1,10 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">4dp</dimen>
+    <dimen name="activity_vertical_margin">4dp</dimen>
+    <dimen name="grid_image_view_movie_width">150dp</dimen>
+    <dimen name="grid_image_view_movie_height">200dp</dimen>
+    <dimen name="grid_image_view_movie_spacing">4dp</dimen>
+    <dimen name="detail_view_rating_padding">20dp</dimen>
+    <dimen name="detail_view_layout_margin">20dp</dimen>
+</resources>
