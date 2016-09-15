@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,7 +42,7 @@ import java.util.List;
 public class MovieGridFragment extends Fragment{
 
     private final String LOG_TAG = "MovieGridFragment";
-    private MovieImageAdapter movieImageAdapter;
+    private MovieAdapter movieAdapter;
     private List<Movie> mMovies;
     private FetchMovieDataTask fetchMovieDataTask;
     private String sortOrder;
@@ -54,16 +55,6 @@ public class MovieGridFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.v("MovieGridFragment","onCreate - empty instance:"+(savedInstanceState==null));
-
-        if(savedInstanceState==null) {
-            Log.v(LOG_TAG,"onCreate - NULL bundle");
-            mMovies = new ArrayList<Movie>();
-            sortOrder = getString(R.string.fetch_popularity);
-        }else{
-            Log.v(LOG_TAG,"onCreate - NOT NULL bundle");
-            mMovies = savedInstanceState.getParcelableArrayList("movies");
-            sortOrder = savedInstanceState.getString("sortOrder");
-        }
     }
 
     @Override
@@ -76,6 +67,7 @@ public class MovieGridFragment extends Fragment{
     public void onStop(){
         Log.v(LOG_TAG,"onStop");
         super.onStop();
+        getFragmentManager().saveFragmentInstanceState(this);
     }
 
     @Override
@@ -88,9 +80,9 @@ public class MovieGridFragment extends Fragment{
     public void onSaveInstanceState(Bundle outState){
         Log.v("MovieGridFragment","onSaveInstanceState");
 
-        //outState.putParcelableArrayList("movies",(ArrayList<Movie>)mMovies);
+        outState.putParcelableArrayList("movies",(ArrayList<Movie>)mMovies);
         outState.putString("sortOrder",sortOrder);
-        Log.v(LOG_TAG,"outState contains sortOrder == "+outState.getString("sortOrder"));
+        Log.v(LOG_TAG,"outState contains movies DNE == "+(outState.getParcelableArrayList("movies")==null));
 
         super.onSaveInstanceState(outState);
     }
@@ -105,7 +97,6 @@ public class MovieGridFragment extends Fragment{
     private void updateSortOrder() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
-        List<String> movieUrls = new ArrayList<String>();
 
         if(mMovies==null){
             Log.v(LOG_TAG,"NULL mMovies...?");
@@ -147,16 +138,28 @@ public class MovieGridFragment extends Fragment{
 
         Log.v("MovieGridFragment","onCreateView -- Starting");
 
+        this.setRetainInstance(true);
+        if(savedInstanceState==null) {
+            Log.v(LOG_TAG,"onCreateView - NULL bundle");
+            mMovies = new ArrayList<Movie>();
+            sortOrder = getString(R.string.fetch_popularity);
+        }else{
+            Log.v(LOG_TAG,"onCreateView - NOT NULL bundle");
+            mMovies = savedInstanceState.getParcelableArrayList("movies");
+            sortOrder = savedInstanceState.getString("sortOrder");
+        }
+
         setHasOptionsMenu(true);
 
-        movieImageAdapter = new MovieImageAdapter(getContext());
+        movieAdapter = new MovieAdapter(getContext());
+        movieAdapter.setMovies(mMovies);
 
         //Inflate xml
         View rootView = inflater.inflate(R.layout.fragment_main,container,false);
 
         //Attach adapter to Grid View
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
-        gridView.setAdapter(movieImageAdapter);
+        gridView.setAdapter(movieAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -242,16 +245,8 @@ public class MovieGridFragment extends Fragment{
         @Override
         protected void onPostExecute(List<Movie> results){
             if(results==null)return;
-
             mMovies = results;
-
-            List<String> movieUrls = new ArrayList<String>();
-
-            for(int i =0;i<mMovies.size();i++){
-                movieUrls.add(mMovies.get(i).getPosterPath());
-            }
-
-            movieImageAdapter.setMovieUrls(movieUrls);
+            movieAdapter.setMovies(mMovies);
         }
 
         protected List<Movie> decodeJsonToMovies(JSONObject retJson) throws JSONException{

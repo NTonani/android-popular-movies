@@ -16,28 +16,28 @@ import java.util.List;
 /**
  * Created by ntonani on 9/11/16.
  */
-public class MovieImageAdapter extends BaseAdapter {
+public class MovieAdapter extends BaseAdapter {
 
     private final String LOG_TAG = "MovieImageAdapter";
     private Context mContext;
     private LayoutInflater inflater;
-    private List<String> mMovieUrls;
+    private List<Movie> mMovies;
 
-    public MovieImageAdapter(Context c){
+    public MovieAdapter(Context c){
         this.mContext = c;
-        mMovieUrls = new ArrayList<String> ();
+        mMovies = new ArrayList<Movie> ();
         inflater = LayoutInflater.from(mContext);
     }
 
     @Override
     public int getCount(){
-        return this.mMovieUrls.size();
+        return this.mMovies.size();
     }
 
     @Override
     public Object getItem(int position) {
         if(position < 0 || position > getCount()) return "";
-        return this.mMovieUrls.get(position);
+        return this.mMovies.get(position);
     }
 
     @Override
@@ -51,18 +51,23 @@ public class MovieImageAdapter extends BaseAdapter {
         if(convertView==null){
             convertView = inflater.inflate(R.layout.fragment_main_image_view,parent,false);
         }
-        String url = (String)getItem(position);
+        Movie movie = (Movie)getItem(position);
+        String url = movie.getPosterPath();
         Picasso.with(mContext).load(url).into((ImageView)convertView.findViewById(R.id.imageview_movies));
         return convertView;
     }
 
-    public void setMovieUrls(List<String> movieUrls){
-        this.mMovieUrls=movieUrls;
+    public void setMovies(List<Movie> movies){
+        this.mMovies=movies;
         this.notifyDataSetChanged();
     }
 
-    public void addMovieUrl(String url){
-        this.mMovieUrls.add(url);
+    public void addMovie(Movie movie){
+        this.mMovies.add(movie);
         this.notifyDataSetChanged();
+    }
+
+    public List<Movie> getMovies(){
+        return this.mMovies;
     }
 }
