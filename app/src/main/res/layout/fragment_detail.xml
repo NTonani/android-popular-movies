@@ -28,7 +28,7 @@
 
         <LinearLayout
             android:id="@+id/movieDetail_ratingReleaseLayout"
-            android:layout_width="@dimen/grid_image_view_movie_width"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/grid_image_view_movie_height"
             android:orientation="vertical"
             android:layout_toRightOf="@id/movieDetail_thumbnail"

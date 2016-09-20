@@ -53,21 +53,25 @@ public class MovieAdapter extends BaseAdapter {
         }
         Movie movie = (Movie)getItem(position);
         String url = movie.getPosterPath();
-        Picasso.with(mContext).load(url).into((ImageView)convertView.findViewById(R.id.imageview_movies));
+        Picasso.with(mContext).load(url).noFade().into((ImageView)convertView.findViewById(R.id.imageview_movies));
         return convertView;
     }
 
-    public void setMovies(List<Movie> movies){
-        this.mMovies=movies;
-        this.notifyDataSetChanged();
+    public void add(Movie object) {
+        mMovies.add(object);
+        notifyDataSetChanged();
     }
 
-    public void addMovie(Movie movie){
-        this.mMovies.add(movie);
-        this.notifyDataSetChanged();
+    public void clear() {
+        mMovies.clear();
+        notifyDataSetChanged();
     }
 
-    public List<Movie> getMovies(){
-        return this.mMovies;
+    public void setMovies(List<Movie> data) {
+        clear();
+        if(data==null)return;
+        for (Movie movie : data) {
+            add(movie);
+        }
     }
 }

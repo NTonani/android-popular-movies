@@ -14,6 +14,8 @@
 
     <!-- Fetch -->
     <string name="fetch_popularity">popular</string>
+    <string name="fetch_popularity_var">mMoviesPopularity</string>
     <string name="fetch_rating">top_rated</string>
+    <string name="fetch_rating_var">mMoviesRating</string>
 
 </resources>
