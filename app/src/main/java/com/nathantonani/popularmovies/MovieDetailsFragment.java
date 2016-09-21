@@ -84,6 +84,7 @@ public class MovieDetailsFragment extends Fragment {
         if(mMovieObject==null) return rootView;
 
         //Add image
+        //PicassoCache.getPicassoInstance(getActivity()).load(mMovieObject.getPosterPath()).into((ImageView)rootView.findViewById(R.id.movieDetail_thumbnail));
         Picasso.with(getActivity()).load(mMovieObject.getPosterPath()).into((ImageView)rootView.findViewById(R.id.movieDetail_thumbnail));
 
         //Add title

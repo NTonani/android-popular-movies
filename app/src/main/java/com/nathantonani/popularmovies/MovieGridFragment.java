@@ -38,8 +38,6 @@ import java.util.List;
 
 /*
  * TODO:
- * 0. Remove Settings and replace with Sort By
- * 1. Cache both sort lists - add list to adapter if not current
  * 2. Wait to load fragment page until picture fetched
  * 3. Look into how Picasso caches photos? Thumbnails in fragment should be cached outside? Fetch/store image thumbnail in movei object?
  */
@@ -53,9 +51,6 @@ public class MovieGridFragment extends Fragment{
 
     private List<Movie> mMoviesRating;
     private List<Movie> mMoviesPopular;
-
-    private List<Movie> mRatingMovies;
-    private List<Movie> mPopularityMovies;
 
     private MovieAdapter movieAdapter;
     private FetchMovieDataTask fetchPopular;
@@ -122,6 +117,13 @@ public class MovieGridFragment extends Fragment{
         if(id==R.id.action_settings){
             startActivity(new Intent(getActivity(), SettingsActivity.class));
             return true;
+        }else if(id==R.id.action_refresh){
+            fetchRating=null;
+            fetchPopular=null;
+            mMoviesPopular=null;
+            mMoviesRating=null;
+            updateAdapterWithSortOrder();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -157,9 +159,9 @@ public class MovieGridFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movieObject = null;
-                if(sortOrder.equals(getString(R.string.fetch_popularity)))
+                if(sortOrder.equals(getString(R.string.pref_sort_popularity)))
                     movieObject = mMoviesPopular.get(position);
-                else if(sortOrder.equals(getString(R.string.fetch_rating)))
+                else if(sortOrder.equals(getString(R.string.pref_sort_rating)))
                     movieObject=mMoviesRating.get(position);
 
                 Intent intent = new Intent(getActivity(),DetailActivity.class);
@@ -187,6 +189,7 @@ public class MovieGridFragment extends Fragment{
     private void updateAdapterWithSortOrder() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
+        sortOrder = sort;
 
         if(mMoviesPopular==null || mMoviesRating==null) {
             fetchMovieData();

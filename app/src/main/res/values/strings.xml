@@ -5,6 +5,10 @@
     <string name="poster_path_base">http://image.tmdb.org/t/p</string>
     <string name="poster_size">w185</string>
 
+    <!-- Actions -->
+    <string name="settings_label">Settings</string>
+    <string name="refresh_label">Refresh</string>
+
     <!-- Settings -->
     <string name="action_settings">Settings</string>
     <string name="pref_sort_label">Sort Order</string>
@@ -13,9 +17,9 @@
     <string name="pref_sort_rating">Rating</string>
 
     <!-- Fetch -->
-    <string name="fetch_popularity">popular</string>
+    <string name="fetch_popularity" translatable="false">popular</string>
     <string name="fetch_popularity_var">mMoviesPopularity</string>
-    <string name="fetch_rating">top_rated</string>
+    <string name="fetch_rating" translatable="false">top_rated</string>
     <string name="fetch_rating_var">mMoviesRating</string>
 
 </resources>

@@ -22,6 +22,8 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="@dimen/grid_image_view_movie_width"
+            android:minHeight="@dimen/grid_image_view_movie_height"
             android:id="@+id/movieDetail_thumbnail"
             android:layout_below="@id/movieDetail_title"
             android:layout_alignParentLeft="true"/>
