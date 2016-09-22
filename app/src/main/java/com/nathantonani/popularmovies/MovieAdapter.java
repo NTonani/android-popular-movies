@@ -54,6 +54,7 @@ public class MovieAdapter extends BaseAdapter {
         Movie movie = (Movie)getItem(position);
         String url = movie.getPosterPath();
         //PicassoCache.getPicassoInstance(mContext).load(url).noFade().into((ImageView)convertView.findViewById(R.id.imageview_movies));
+        //Picasso.with(mContext).setIndicatorsEnabled(true);
         Picasso.with(mContext).load(url).noFade().into((ImageView)convertView.findViewById(R.id.imageview_movies));
         return convertView;
     }
