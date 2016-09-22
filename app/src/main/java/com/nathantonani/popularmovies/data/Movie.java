@@ -1,13 +1,10 @@
-package com.nathantonani.popularmovies;
+package com.nathantonani.popularmovies.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.nathantonani.popularmovies.MainActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 /**
  * Created by ntonani on 9/11/16.
@@ -27,7 +24,6 @@ public class Movie implements Parcelable{
 
     public Movie(JSONObject movieJson) throws JSONException{
 
-        //TODO: poster size should be determined by screen size
         this.posterPath = urlBase+picWidthLarge+movieJson.getString("poster_path");
         this.overview = movieJson.getString("overview");
         this.releaseDateString = movieJson.getString("release_date");
