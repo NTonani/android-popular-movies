@@ -14,14 +14,25 @@ import com.nathantonani.popularmovies.data.Movie;
 import com.nathantonani.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by ntonani on 9/12/16.
  */
 public class MovieDetailsFragment extends Fragment {
 
     private final String LOG_TAG = MovieDetailsFragment.class.getSimpleName();
-
     private Movie mMovieObject;
+
+    @BindView(R.id.movieDetail_title) TextView movieTitle_view;
+    @BindView(R.id.movieDetail_overview) TextView movieOverview_view;
+    @BindView(R.id.movieDetail_releaseDate) TextView movieRelease_view;
+    @BindView(R.id.movieDetail_rating) TextView movieRating_view;
+    @BindView(R.id.movieDetail_thumbnail) ImageView movieThumbnail_view;
+
+    @BindString(R.string.movie_details_parcel) String movieDetails_parcel;
 
     /*
      * Fragment lifecycle / callbacks
@@ -33,35 +44,38 @@ public class MovieDetailsFragment extends Fragment {
         //Inflate fragment
         View rootView = inflater.inflate(R.layout.fragment_detail,container,false);
 
+        //Bind Butter Knife
+        ButterKnife.bind(this,rootView);
+
         //Check intent content
         Intent intent = getActivity().getIntent();
-        if(intent!=null && intent.hasExtra("movie"))
-            mMovieObject = intent.getExtras().getParcelable("movie");
+        if(intent!=null && intent.hasExtra(movieDetails_parcel))
+            mMovieObject = intent.getExtras().getParcelable(movieDetails_parcel);
 
         //Check bundle state
-        if(mMovieObject==null && savedInstanceState!=null && savedInstanceState.getParcelable("detailsMovie")!=null)
-            mMovieObject = savedInstanceState.getParcelable("detailsMovie");
+        if(mMovieObject==null && savedInstanceState!=null && savedInstanceState.getParcelable(movieDetails_parcel)!=null)
+            mMovieObject = savedInstanceState.getParcelable(movieDetails_parcel);
 
         if(mMovieObject==null) return rootView;
 
         //Add image
         try {
             Picasso.with(getActivity()).setIndicatorsEnabled(true);
-            Picasso.with(getActivity()).load(mMovieObject.getPosterPath()).into((ImageView) rootView.findViewById(R.id.movieDetail_thumbnail));
+            Picasso.with(getActivity()).load(mMovieObject.getPosterPath()).into(movieThumbnail_view);
         }catch(Exception e){
             Log.e(LOG_TAG,"Error loading image: "+e.toString());
         }
         //Add title
-        ((TextView)rootView.findViewById(R.id.movieDetail_title)).setText(mMovieObject.getTitle());
+        movieTitle_view.setText(mMovieObject.getTitle());
 
         //Add overview
-        ((TextView)rootView.findViewById(R.id.movieDetail_overview)).setText(mMovieObject.getOverview());
+        movieOverview_view.setText(mMovieObject.getOverview());
 
         //Add release date
-        ((TextView)rootView.findViewById(R.id.movieDetail_releaseDate)).setText(mMovieObject.getReleaseDateString());
+        movieRelease_view.setText(mMovieObject.getReleaseDateString());
 
         //Add rating
-        ((TextView)rootView.findViewById(R.id.movieDetail_rating)).setText("User Rating: "+mMovieObject.getUserRating());
+        movieRating_view.setText("User Rating: "+mMovieObject.getUserRating());
 
         return rootView;
     }
@@ -71,7 +85,7 @@ public class MovieDetailsFragment extends Fragment {
 
         //Store bundle data
         if(mMovieObject!=null)
-            outState.putParcelable(getString(R.string.movie_details_parce),mMovieObject);
+            outState.putParcelable(movieDetails_parcel,mMovieObject);
         super.onSaveInstanceState(outState);
     }
 

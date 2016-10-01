@@ -24,6 +24,6 @@
     <string name="fetch_rating_var">mMoviesRating</string>
 
     <!-- Parcelables -->
-    <string name="movie_details_parce">movieDetails</string>
+    <string name="movie_details_parcel">movieDetails</string>
 
 </resources>

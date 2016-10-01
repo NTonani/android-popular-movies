@@ -37,6 +37,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
+
 
 /**
  * Created by ntonani on 9/11/16.
@@ -49,10 +55,24 @@ public class MovieGridFragment extends Fragment{
     private List<Movie> mMoviesPopular;
 
     private MovieAdapter movieAdapter;
-    private FetchMovieDataTask fetchPopular;
-    private FetchMovieDataTask fetchRating;
+    private FetchMovieDataTask fetchPopularTask;
+    private FetchMovieDataTask fetchRatingTask;
     private String sortOrder;
 
+    @BindView(R.id.gridview_movies) GridView gridView;
+
+    @BindString(R.string.movie_details_parcel) String movieDetails_parcel;
+
+    @BindString(R.string.fetch_rating) String fetchRating;
+    @BindString(R.string.fetch_popularity) String fetchPopularity;
+    @BindString(R.string.fetch_popularity_var) String fetchPopularityVar;
+    @BindString(R.string.fetch_rating_var) String fetchRatingVar;
+
+    @BindString(R.string.pref_sort_key) String prefSortKey;
+    @BindString(R.string.pref_sort_popularity) String prefSortPopularity;
+    @BindString(R.string.pref_sort_rating) String prefSortRating;
+
+    @BindString(R.string.movies_path_base) String moviePathBase;
     /*
      * Fragment lifecycle / callbacks
      */
@@ -60,41 +80,26 @@ public class MovieGridFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
+        //Inflate xml
+        View rootView = inflater.inflate(R.layout.fragment_main,container,false);
+        ButterKnife.bind(this,rootView);
+
         this.setRetainInstance(true);
         setHasOptionsMenu(true);
 
         movieAdapter = new MovieAdapter(getContext());
 
         if(savedInstanceState==null)
-            sortOrder = getString(R.string.fetch_popularity);
+            sortOrder = fetchPopularity;
         else{
             //Get bundled content
-            mMoviesPopular = savedInstanceState.getParcelableArrayList(getString(R.string.fetch_popularity_var));
-            mMoviesRating = savedInstanceState.getParcelableArrayList(getString(R.string.fetch_rating_var));
-            sortOrder = savedInstanceState.getString("sortOrder");
+            mMoviesPopular = savedInstanceState.getParcelableArrayList(fetchPopularityVar);
+            mMoviesRating = savedInstanceState.getParcelableArrayList(fetchRatingVar);
+            sortOrder = savedInstanceState.getString(prefSortKey);
         }
 
-        //Inflate xml
-        View rootView = inflater.inflate(R.layout.fragment_main,container,false);
-
         //Attach adapter to Grid View with click listener
-        GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
         gridView.setAdapter(movieAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movieObject = null;
-                if(sortOrder.equals(getString(R.string.pref_sort_popularity)))
-                    movieObject = mMoviesPopular.get(position);
-                else if(sortOrder.equals(getString(R.string.pref_sort_rating)))
-                    movieObject=mMoviesRating.get(position);
-
-                Intent intent = new Intent(getActivity(),DetailActivity.class);
-                intent.putExtra("movie",movieObject);
-                startActivity(intent);
-            }
-        });
-
         return rootView;
     }
 
@@ -114,8 +119,8 @@ public class MovieGridFragment extends Fragment{
             return true;
         }else if(id==R.id.action_refresh){
             //Set data to null and re-fetch
-            fetchRating=null;
-            fetchPopular=null;
+            fetchRatingTask=null;
+            fetchPopularTask=null;
             mMoviesPopular=null;
             mMoviesRating=null;
             updateAdapterWithSortOrder();
@@ -129,9 +134,9 @@ public class MovieGridFragment extends Fragment{
     public void onSaveInstanceState(Bundle outState){
 
         //Save current sort lists and current sort
-        outState.putParcelableArrayList(getString(R.string.fetch_rating_var),(ArrayList<Movie>)mMoviesPopular);
-        outState.putParcelableArrayList(getString(R.string.fetch_popularity_var),(ArrayList<Movie>)mMoviesRating);
-        outState.putString("sortOrder",sortOrder);
+        outState.putParcelableArrayList(fetchRatingVar,(ArrayList<Movie>)mMoviesPopular);
+        outState.putParcelableArrayList(fetchPopularityVar,(ArrayList<Movie>)mMoviesRating);
+        outState.putString(prefSortKey,sortOrder);
 
         super.onSaveInstanceState(outState);
     }
@@ -149,7 +154,7 @@ public class MovieGridFragment extends Fragment{
     private void updateAdapterWithSortOrder() {
         //Determine current sort
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popularity));
+        String sort = prefs.getString(prefSortKey, prefSortPopularity);
         sortOrder = sort;
 
         //If sorts are null - fetch
@@ -159,28 +164,45 @@ public class MovieGridFragment extends Fragment{
         }
 
         //Set adapter data
-        if(sort.equals(getString(R.string.pref_sort_popularity)))
+        if(sort.equals(prefSortPopularity))
             movieAdapter.setMovies(mMoviesPopular);
-        else if(sort.equals(getString(R.string.pref_sort_rating)))
+        else if(sort.equals(prefSortRating))
             movieAdapter.setMovies(mMoviesRating);
+    }
+
+    /*
+     * Listeners
+     */
+
+    @OnItemClick(R.id.gridview_movies)
+    public void onThumbnailClick(int position) {
+        Movie movieObject = null;
+        if(sortOrder.equals(prefSortPopularity))
+            movieObject = mMoviesPopular.get(position);
+        else if(sortOrder.equals(prefSortRating))
+            movieObject=mMoviesRating.get(position);
+
+        Intent intent = new Intent(getActivity(),DetailActivity.class);
+        intent.putExtra(movieDetails_parcel,movieObject);
+        startActivity(intent);
     }
 
     /*
      * Data fetching
      */
 
-    private void fetchMovieData(){
+    public void fetchMovieData(){
 
         //Fetch popularity payload if null
-        if(fetchPopular==null) {
-            fetchPopular=new FetchMovieDataTask();
-            fetchPopular.execute(getString(R.string.fetch_popularity));
+        if(fetchPopularTask==null) {
+            fetchPopularTask=new FetchMovieDataTask();
+            fetchPopularTask.execute(fetchPopularity);
         }
 
         //Fetch rating payload if null
-        if(fetchRating==null) {
-            fetchRating=new FetchMovieDataTask();
-            fetchRating.execute(getString(R.string.fetch_rating));
+        if(fetchRatingTask==null) {
+            fetchRatingTask=new FetchMovieDataTask();
+            fetchRatingTask.execute(fetchRating);
         }
     }
 
@@ -203,7 +225,7 @@ public class MovieGridFragment extends Fragment{
                 currentSort = strings[0];
 
                 //Construct url
-                final String MOVIE_BASE_URL = getString(R.string.movies_path_base)+currentSort+"/";
+                final String MOVIE_BASE_URL = moviePathBase+currentSort+"/";
                 final String QUERY_API_KEY="api_key";
 
                 //Add API key
@@ -241,7 +263,8 @@ public class MovieGridFragment extends Fragment{
             }catch(Exception e){
                 Log.e(LOG_TAG,"Error fetching data: "+e.toString());
             }finally {
-                urlConnection.disconnect();
+                if(urlConnection!=null)
+                    urlConnection.disconnect();
                 try {
                     if(reader!=null)reader.close();
                 }catch(IOException ioE){
@@ -267,9 +290,9 @@ public class MovieGridFragment extends Fragment{
             if(results==null)return;
 
             //Set sort lists
-            if(currentSort.equals(getString(R.string.fetch_popularity)))
+            if(currentSort.equals(fetchPopularity))
                 mMoviesPopular=results;
-            else if(currentSort.equals(getString(R.string.fetch_rating)))
+            else if(currentSort.equals(fetchRating))
                 mMoviesRating=results;
 
             updateAdapterWithSortOrder();

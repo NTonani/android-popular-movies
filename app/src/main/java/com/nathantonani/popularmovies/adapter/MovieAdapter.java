@@ -15,6 +15,9 @@ import com.squareup.picasso.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by ntonani on 9/11/16.
  */
@@ -42,7 +45,10 @@ public class MovieAdapter extends BaseAdapter {
         //Inflate image view item
         if(convertView==null){
             convertView = inflater.inflate(R.layout.fragment_main_image_view,parent,false);
+            convertView.setTag(new ViewHolder(convertView));
         }
+
+        ViewHolder viewHolder = (ViewHolder)convertView.getTag();
 
         //Get movie data
         Movie movie = (Movie)getItem(position);
@@ -51,10 +57,11 @@ public class MovieAdapter extends BaseAdapter {
         //Load thumbnail into image view item
         try {
             Picasso.with(mContext).setIndicatorsEnabled(true);
-            Picasso.with(mContext).load(url).noFade().into((ImageView) convertView.findViewById(R.id.imageview_movies));
+            Picasso.with(mContext).load(url).noFade().into(viewHolder.imageView);
         }catch(Exception e){
             Log.e(LOG_TAG,"Error loading image:" +e.toString());
         }
+
         return convertView;
     }
 
@@ -93,6 +100,14 @@ public class MovieAdapter extends BaseAdapter {
         if(data==null)return;
         for (Movie movie : data) {
             add(movie);
+        }
+    }
+
+    static class ViewHolder {
+        @BindView(R.id.imageview_movies) ImageView imageView;
+
+        ViewHolder(View view){
+            ButterKnife.bind(this,view);
         }
     }
 }

@@ -19,15 +19,24 @@ android {
     }
 
     buildTypes.each{
-        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', "{API.KEY}"
+        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', "\"225ea825abd220272d44931f87f281d5\""
     }
 }
+
+apply plugin:'android-apt'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.0'
+
+    //Picasso image loading
     compile 'com.squareup.picasso:picasso:2.5.2'
+
+    //Butterknife annotations
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+
 }
 
 repositories{
