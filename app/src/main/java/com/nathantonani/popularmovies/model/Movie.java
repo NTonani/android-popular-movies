@@ -1,4 +1,4 @@
-package com.nathantonani.popularmovies.data;
+package com.nathantonani.popularmovies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

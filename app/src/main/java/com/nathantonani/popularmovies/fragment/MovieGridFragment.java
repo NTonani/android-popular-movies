@@ -14,11 +14,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.nathantonani.popularmovies.BuildConfig;
-import com.nathantonani.popularmovies.data.Movie;
+import com.nathantonani.popularmovies.model.Movie;
 import com.nathantonani.popularmovies.R;
 import com.nathantonani.popularmovies.activity.SettingsActivity;
 import com.nathantonani.popularmovies.activity.DetailActivity;
@@ -40,7 +39,6 @@ import java.util.List;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 

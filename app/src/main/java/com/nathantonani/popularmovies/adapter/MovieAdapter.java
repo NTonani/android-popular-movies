@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.nathantonani.popularmovies.data.Movie;
+import com.nathantonani.popularmovies.model.Movie;
 import com.nathantonani.popularmovies.R;
 import com.squareup.picasso.*;
 
@@ -41,12 +41,13 @@ public class MovieAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         //Inflate image view item
         if(convertView==null){
+            Log.v(LOG_TAG,"New View");
             convertView = inflater.inflate(R.layout.fragment_main_image_view,parent,false);
             convertView.setTag(new ViewHolder(convertView));
         }
+
 
         ViewHolder viewHolder = (ViewHolder)convertView.getTag();
 

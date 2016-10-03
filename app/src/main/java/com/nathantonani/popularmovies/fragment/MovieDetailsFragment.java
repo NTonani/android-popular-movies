@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nathantonani.popularmovies.data.Movie;
+import com.nathantonani.popularmovies.model.Movie;
 import com.nathantonani.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
@@ -75,7 +75,7 @@ public class MovieDetailsFragment extends Fragment {
         movieRelease_view.setText(mMovieObject.getReleaseDateString());
 
         //Add rating
-        movieRating_view.setText("User Rating: "+mMovieObject.getUserRating());
+        movieRating_view.setText("User Rating: "+mMovieObject.getUserRating()); //TODO: Resource string with placeholder
 
         return rootView;
     }
