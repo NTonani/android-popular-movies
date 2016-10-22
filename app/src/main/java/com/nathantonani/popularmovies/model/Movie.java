@@ -1,10 +1,14 @@
 package com.nathantonani.popularmovies.model;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.nathantonani.popularmovies.data.MoviesContract.MovieEntry;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 /**
  * Created by ntonani on 9/11/16.
@@ -15,6 +19,7 @@ public class Movie implements Parcelable{
     private final String picWidthSmall = "w342";
     private final String picWidthLarge = "w500";
 
+    private int movieId;
     private String posterPath;
     private String overview;
     private String releaseDateString;
@@ -30,11 +35,13 @@ public class Movie implements Parcelable{
         this.title = movieJson.getString("original_title");
         this.userRating = movieJson.getDouble("vote_average");
         this.popularity = movieJson.getDouble("popularity");
+        this.movieId = movieJson.getInt("id");
 
     }
 
-    public Movie(String posterPath, String overview, String releaseDateString, String title, Double userRating, Double popularity){
+    public Movie(int movieId, String posterPath, String overview, String releaseDateString, String title, Double userRating, Double popularity){
 
+        this.movieId = movieId;
         this.posterPath = urlBase+picWidthLarge+posterPath;
         this.overview = overview;
         this.releaseDateString = releaseDateString;
@@ -110,8 +117,24 @@ public class Movie implements Parcelable{
 
     public Double getPopularity() { return popularity; }
 
+    public int getMovieId() {return movieId;}
+
     @Override
     public String toString(){
         return this.title+" -- "+this.overview;
     }
+
+    public ContentValues getContentValues(){
+        ContentValues cv = new ContentValues();
+        cv.put(MovieEntry.COLUMN_MOVIE_ID,movieId);
+        cv.put(MovieEntry.COLUMN_TITLE,title);
+        cv.put(MovieEntry.COLUMN_OVERVIEW,overview);
+        cv.put(MovieEntry.COLUMN_RELEASE_DATE,releaseDateString);
+        cv.put(MovieEntry.COLUMN_POSTER_PATH,posterPath);
+        cv.put(MovieEntry.COLUMN_POPULARITY,popularity);
+        cv.put(MovieEntry.COLUMN_VOTE_AVERAGE,getUserRating());
+        cv.put(MovieEntry.COLUMN_ADULT,false);
+        return cv;
+    }
+
 }

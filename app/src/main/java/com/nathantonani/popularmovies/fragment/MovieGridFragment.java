@@ -2,12 +2,9 @@ package com.nathantonani.popularmovies.fragment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,23 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import com.nathantonani.popularmovies.BuildConfig;
-import com.nathantonani.popularmovies.model.Movie;
 import com.nathantonani.popularmovies.R;
-import com.nathantonani.popularmovies.activity.SettingsActivity;
 import com.nathantonani.popularmovies.activity.DetailActivity;
+import com.nathantonani.popularmovies.activity.SettingsActivity;
 import com.nathantonani.popularmovies.adapter.MovieAdapter;
+import com.nathantonani.popularmovies.model.Movie;
+import com.nathantonani.popularmovies.sync.FetchMovieDataTask;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +36,8 @@ public class MovieGridFragment extends Fragment{
 
     private final String LOG_TAG = MovieGridFragment.class.getSimpleName();
 
-    private List<Movie> mMoviesRating;
-    private List<Movie> mMoviesPopular;
+    public List<Movie> mMoviesRating;
+    public List<Movie> mMoviesPopular;
 
     private MovieAdapter movieAdapter;
     private FetchMovieDataTask fetchPopularTask;
@@ -61,8 +48,8 @@ public class MovieGridFragment extends Fragment{
 
     @BindString(R.string.movie_details_parcel) String movieDetails_parcel;
 
-    @BindString(R.string.fetch_rating) String fetchRating;
-    @BindString(R.string.fetch_popularity) String fetchPopularity;
+    @BindString(R.string.fetch_rating) public String fetchRating;
+    @BindString(R.string.fetch_popularity) public String fetchPopularity;
     @BindString(R.string.fetch_popularity_var) String fetchPopularityVar;
     @BindString(R.string.fetch_rating_var) String fetchRatingVar;
 
@@ -70,7 +57,7 @@ public class MovieGridFragment extends Fragment{
     @BindString(R.string.pref_sort_popularity) String prefSortPopularity;
     @BindString(R.string.pref_sort_rating) String prefSortRating;
 
-    @BindString(R.string.movies_path_base) String moviePathBase;
+    @BindString(R.string.movies_path_base) public String moviePathBase;
     /*
      * Fragment lifecycle / callbacks
      */
@@ -149,7 +136,7 @@ public class MovieGridFragment extends Fragment{
      * Adapter update
      */
 
-    private void updateAdapterWithSortOrder() {
+    public void updateAdapterWithSortOrder() {
         //Determine current sort
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sort = prefs.getString(prefSortKey, prefSortPopularity);
@@ -193,122 +180,14 @@ public class MovieGridFragment extends Fragment{
 
         //Fetch popularity payload if null
         if(fetchPopularTask==null) {
-            fetchPopularTask=new FetchMovieDataTask();
+            fetchPopularTask=new FetchMovieDataTask(this.getContext(),this,movieAdapter);
             fetchPopularTask.execute(fetchPopularity);
         }
 
         //Fetch rating payload if null
         if(fetchRatingTask==null) {
-            fetchRatingTask=new FetchMovieDataTask();
+            fetchRatingTask=new FetchMovieDataTask(this.getContext(),this,movieAdapter);
             fetchRatingTask.execute(fetchRating);
-        }
-    }
-
-    public class FetchMovieDataTask extends AsyncTask<String,Void,List<Movie>>{
-
-        private final String LOG_TAG = FetchMovieDataTask.class.getSimpleName();
-
-        private String currentSort;
-
-        @Override
-        protected List<Movie> doInBackground(String... strings) {
-
-            String movieJsonString = null;
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            try{
-                //Passed in sort
-                currentSort = strings[0];
-
-                //Construct url
-                final String MOVIE_BASE_URL = moviePathBase+currentSort+"/";
-                final String QUERY_API_KEY="api_key";
-
-                //Add API key
-                Uri uri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
-                        .build();
-
-                URL url = new URL(uri.toString());
-
-                //Connect
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                //Read input
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-
-                if(inputStream == null) return null;
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-
-                //Debugging purposes
-                while((line=reader.readLine()) != null){
-                    buffer.append(line+"\n");
-                }
-
-                if(buffer.length()==0)return null;
-
-                //Final json
-                movieJsonString = buffer.toString();
-
-            }catch(Exception e){
-                Log.e(LOG_TAG,"Error fetching data: "+e.toString());
-            }finally {
-                if(urlConnection!=null)
-                    urlConnection.disconnect();
-                try {
-                    if(reader!=null)reader.close();
-                }catch(IOException ioE){
-                    Log.e(LOG_TAG,"Could not close reader: "+ioE.toString());
-                }
-            }
-
-            if(movieJsonString==null)return null;
-
-            try {
-                //Return decoded json
-                return decodeJsonToMovies(new JSONObject(movieJsonString));
-            }catch(JSONException jsonE){
-                Log.e(LOG_TAG,"JSON failure: "+jsonE.toString());
-            }
-
-            //Fail state
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Movie> results){
-            if(results==null)return;
-
-            //Set sort lists
-            if(currentSort.equals(fetchPopularity))
-                mMoviesPopular=results;
-            else if(currentSort.equals(fetchRating))
-                mMoviesRating=results;
-
-            updateAdapterWithSortOrder();
-        }
-
-        protected List<Movie> decodeJsonToMovies(JSONObject retJson) throws JSONException{
-
-            //Decode JSON
-            JSONArray movieObjects = retJson.getJSONArray("results");
-
-            if(movieObjects==null)return null;
-            List<Movie> fetchedMovies = new ArrayList<Movie>();
-
-            for(int i =0;i<movieObjects.length();i++){
-                fetchedMovies.add(new Movie(movieObjects.getJSONObject(i)));
-            }
-
-            return fetchedMovies;
         }
     }
 }
