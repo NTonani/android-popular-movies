@@ -39,10 +39,10 @@ public class Movie implements Parcelable{
 
     }
 
-    public Movie(int movieId, String posterPath, String overview, String releaseDateString, String title, Double userRating, Double popularity){
+    public Movie(int movieId, String title, String overview, String releaseDateString, Double popularity, Double userRating,String posterPath){
 
         this.movieId = movieId;
-        this.posterPath = urlBase+picWidthLarge+posterPath;
+        this.posterPath = posterPath;
         this.overview = overview;
         this.releaseDateString = releaseDateString;
         this.title = title;

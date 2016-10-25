@@ -9,8 +9,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.nathantonani.popularmovies.BuildConfig;
-import com.nathantonani.popularmovies.adapter.MovieAdapter;
-import com.nathantonani.popularmovies.data.MoviesContract.MovieEntry;
+import com.nathantonani.popularmovies.adapter.MovieCursorAdapter;
+import com.nathantonani.popularmovies.data.MoviesContract;
 import com.nathantonani.popularmovies.fragment.MovieGridFragment;
 import com.nathantonani.popularmovies.model.Movie;
 
@@ -27,13 +27,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FetchMovieDataTask extends AsyncTask<String,Void,List<Movie>> {
+public class FetchMovieDataTask extends AsyncTask<String,Void,Void> {
 
     private final Context mContext;
-    private MovieAdapter mMovieAdapter;
+    private MovieCursorAdapter mMovieAdapter;
     private MovieGridFragment mMovieGridFragment;
 
-    public FetchMovieDataTask(Context context, MovieGridFragment fragment, MovieAdapter adapter){
+    public FetchMovieDataTask(Context context, MovieGridFragment fragment, MovieCursorAdapter adapter){
         this.mContext = context;
         this.mMovieAdapter = adapter;
         this.mMovieGridFragment = fragment;
@@ -44,7 +44,7 @@ public class FetchMovieDataTask extends AsyncTask<String,Void,List<Movie>> {
     private String currentSort;
 
     @Override
-    protected List<Movie> doInBackground(String... strings) {
+    protected Void doInBackground(String... strings) {
 
         String movieJsonString = null;
 
@@ -107,34 +107,22 @@ public class FetchMovieDataTask extends AsyncTask<String,Void,List<Movie>> {
 
     try {
         //Return decoded json
-        return decodeJsonToMovies(new JSONObject(movieJsonString));
-    }catch(JSONException jsonE){
-        Log.e(LOG_TAG,"JSON failure: "+jsonE.toString());
-    }
-
-    //Fail state
-    return null;
-}
-
-    @Override
-    protected void onPostExecute(List<Movie> results){
-        if(results==null)return;
-
-        // TODO Query and store new Movie entries
+        List<Movie> results = decodeJsonToMovies(new JSONObject(movieJsonString));
         ContentValues[] cvs = getMovieContentValuesFromMovies(results);
         for(ContentValues cv : cvs){
-            int cvId = (int) cv.get(MovieEntry.COLUMN_MOVIE_ID);
-            Uri movieItemUri = MovieEntry.buildMovieUri(cvId);
+            int cvId = (int) cv.get(MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
+            Uri movieItemUri = MoviesContract.MovieEntry.buildMovieUri(cvId);
             ContentResolver contentResolver = mContext.getContentResolver();
             Cursor movieCursor = contentResolver.query(movieItemUri,null,null,null,null);
             if(movieCursor==null)continue;
-            if(movieCursor.moveToFirst()){
-                // TODO UPDATE
+
+            // TODO move to bulk update / insert for resource efficiency - prevent
+            // adapter from being updated multiple times?
+
+            if(movieCursor.moveToFirst())
                 contentResolver.update(movieItemUri, cv, null, null);
-            }else{
-               // TODO INSERT
-                contentResolver.insert(MovieEntry.CONTENT_URI,cv);
-            }
+            else
+                contentResolver.insert(MoviesContract.MovieEntry.CONTENT_URI,cv);
 
             movieCursor.close();
 
@@ -142,15 +130,14 @@ public class FetchMovieDataTask extends AsyncTask<String,Void,List<Movie>> {
             // Need to add MovieGenres support
         }
 
-        //Set sort lists
-        if(currentSort.equals(mMovieGridFragment.fetchPopularity))
-            mMovieGridFragment.mMoviesPopular=results;
-        else if(currentSort.equals(mMovieGridFragment.fetchRating))
-            mMovieGridFragment.mMoviesRating=results;
-
         mMovieGridFragment.updateAdapterWithSortOrder();
+    }catch(JSONException jsonE){
+        Log.e(LOG_TAG,"JSON failure: "+jsonE.toString());
     }
 
+    //Fail state
+    return null;
+}
     protected ContentValues[] getMovieContentValuesFromMovies(List<Movie> movies){
         ContentValues[] cvs = new ContentValues[movies.size()];
         for(int i = 0;i<movies.size();i++) cvs[i] = movies.get(i).getContentValues();
