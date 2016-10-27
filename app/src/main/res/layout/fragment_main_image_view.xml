@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/imageview_movies"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="@dimen/grid_image_view_movie_width"
+        android:layout_height="@dimen/grid_image_view_movie_height"
         />
 
 </LinearLayout>

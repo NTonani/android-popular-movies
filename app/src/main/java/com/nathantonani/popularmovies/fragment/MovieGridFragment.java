@@ -23,8 +23,8 @@ import com.nathantonani.popularmovies.R;
 import com.nathantonani.popularmovies.activity.DetailActivity;
 import com.nathantonani.popularmovies.activity.SettingsActivity;
 import com.nathantonani.popularmovies.adapter.MovieCursorAdapter;
+import com.nathantonani.popularmovies.adapter.sync.MoviesSyncAdapter;
 import com.nathantonani.popularmovies.data.MoviesContract.MovieEntry;
-import com.nathantonani.popularmovies.model.Movie;
 import com.nathantonani.popularmovies.sync.FetchMovieDataTask;
 
 import butterknife.BindString;
@@ -44,6 +44,9 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private static final String[] MOVIE_PROJECTION = {
             MovieEntry._ID,
             MovieEntry.COLUMN_MOVIE_ID,
+            MovieEntry.COLUMN_POSTER_PATH
+    };
+            /*
             MovieEntry.COLUMN_TITLE,
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_ADULT,
@@ -51,10 +54,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             MovieEntry.COLUMN_POPULARITY,
             MovieEntry.COLUMN_VOTE_AVERAGE,
             MovieEntry.COLUMN_POSTER_PATH
-    };
+    };*/
 
     public static final int COL_MOVIE_ID = 0;
     public static final int COL_MOVIE_MOVIE_ID = 1;
+    public static final int COL_MOVIE_POSTER_PATH = 2;
+    /*
     public static final int COL_MOVIE_TITLE = 2;
     public static final int COL_MOVIE_OVERVIEW = 3;
     public static final int COL_MOVIE_ADULT = 4;
@@ -62,7 +67,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public static final int COL_MOVIE_POPULARITY = 6;
     public static final int COL_MOVIE_VOTE_AVERAGE = 7;
     public static final int COL_MOVIE_POSTER_PATH = 8;
-
+    */
     public Cursor mMoviesRating;
     public Cursor mMoviesPopular;
 
@@ -199,15 +204,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     @OnItemClick(R.id.gridview_movies)
     public void onThumbnailClick(GridView gridView, View view, int position, long l) {
-        Movie movieObject = null;
         Cursor cursor = (Cursor)gridView.getItemAtPosition(position);
 
         if(cursor == null) return;
-        movieObject = new Movie(cursor.getInt(COL_MOVIE_MOVIE_ID),cursor.getString(COL_MOVIE_TITLE),cursor.getString(COL_MOVIE_OVERVIEW),
-                cursor.getString(COL_MOVIE_RELEASE_DATE),Double.parseDouble(cursor.getString(COL_MOVIE_VOTE_AVERAGE)), Double.parseDouble(cursor.getString(COL_MOVIE_POPULARITY)),
-                cursor.getString(COL_MOVIE_POSTER_PATH));
+
         Intent intent = new Intent(getActivity(),DetailActivity.class);
-        intent.putExtra(movieDetails_parcel,movieObject);
+        intent.setData(MovieEntry.buildMovieUri(cursor.getInt(COL_MOVIE_MOVIE_ID)));
         startActivity(intent);
     }
 
@@ -217,18 +219,15 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
      */
 
     public void fetchMovieData(){
+        MoviesSyncAdapter.syncImmediately(getContext());
         /*
-        //Fetch popularity payload if null
-        if(fetchPopularTask==null) {
+        if(fetchPopularTask==null)
             fetchPopularTask=new FetchMovieDataTask(this.getContext(),this,movieAdapter);
-            fetchPopularTask.execute(fetchPopularity);
-        }
+        fetchPopularTask.execute(fetchPopularity);
 
-        //Fetch rating payload if null
-        if(fetchRatingTask==null) {
+        if(fetchRatingTask == null)
             fetchRatingTask=new FetchMovieDataTask(this.getContext(),this,movieAdapter);
-            fetchRatingTask.execute(fetchRating);
-        }
+        fetchRatingTask.execute(fetchRating);
         */
     }
 
@@ -259,7 +258,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.w(LOG_TAG,"onLoaderReset");
         switch(loader.getId()){
             case MOVIE_LOADER:
                 movieAdapter.swapCursor(null);

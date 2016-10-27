@@ -26,7 +26,7 @@ public class MovieCursorAdapter extends CursorAdapter{
     public MovieCursorAdapter(Context context, Cursor cursor, int flags){
         super(context,cursor,flags);
     }
-/*
+
     // newView creates a view for each cursor item, basically yielding
     // bindView wasteful after the first call. As a workaround, I've
     // overridden getView and simply return the view if it's not null,
@@ -35,7 +35,7 @@ public class MovieCursorAdapter extends CursorAdapter{
     // only be called for the visible image views + one row above and one row
     // below.
 
-
+/*
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
         if(convertView==null) return super.getView(position,convertView,parent);

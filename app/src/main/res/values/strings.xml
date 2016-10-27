@@ -26,4 +26,8 @@
     <!-- Parcelables -->
     <string name="movie_details_parcel">movieDetails</string>
 
+    <!-- SyncAdapter -->
+    <string name="sync_account_type">popularmovies.nathantonani.com</string>
+    <string name="content_authority">com.nathantonani.popularmovies</string>
+
 </resources>
