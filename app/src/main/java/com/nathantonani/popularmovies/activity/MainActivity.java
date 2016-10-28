@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.nathantonani.popularmovies.adapter.sync.MoviesSyncAdapter;
 import com.nathantonani.popularmovies.fragment.MovieGridFragment;
 import com.nathantonani.popularmovies.R;
 
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
             fm.beginTransaction().add(R.id.container,movieGridFragment, MovieGridFragment.class.getSimpleName()).commit();
         }else
             movieGridFragment.getRetainInstance();
+
+        MoviesSyncAdapter.initializeSyncAdapter(this);
 
     }
 }

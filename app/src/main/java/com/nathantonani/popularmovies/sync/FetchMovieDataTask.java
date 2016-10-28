@@ -27,6 +27,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/*
+ * DEPRECATED FOR SYNC ADAPTER
+ */
 public class FetchMovieDataTask extends AsyncTask<String,Void,Void> {
 
     private final Context mContext;

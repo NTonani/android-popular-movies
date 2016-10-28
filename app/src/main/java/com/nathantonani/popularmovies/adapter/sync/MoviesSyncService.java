@@ -15,7 +15,7 @@ public class MoviesSyncService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d("SunshineSyncService", "onCreate - SunshineSyncService");
+        Log.d("MoviesSyncService", "onCreate - MoviesSyncService");
         synchronized (sSyncAdapterLock) {
             if (sMoviesSyncAdapter == null) {
                 sMoviesSyncAdapter = new MoviesSyncAdapter(getApplicationContext(), true);
