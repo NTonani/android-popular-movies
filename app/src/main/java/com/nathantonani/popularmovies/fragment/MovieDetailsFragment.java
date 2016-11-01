@@ -101,6 +101,10 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         super.onSaveInstanceState(outState);
     }
 
+    /*
+     * Loader Callbacks
+     */
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Intent intent = getActivity().getIntent();

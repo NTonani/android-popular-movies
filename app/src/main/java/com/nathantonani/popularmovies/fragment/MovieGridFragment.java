@@ -25,7 +25,6 @@ import com.nathantonani.popularmovies.activity.SettingsActivity;
 import com.nathantonani.popularmovies.adapter.MovieCursorAdapter;
 import com.nathantonani.popularmovies.adapter.sync.MoviesSyncAdapter;
 import com.nathantonani.popularmovies.data.MoviesContract.MovieEntry;
-import com.nathantonani.popularmovies.sync.FetchMovieDataTask;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -39,7 +38,9 @@ import butterknife.OnItemClick;
 public class MovieGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private final String LOG_TAG = MovieGridFragment.class.getSimpleName();
-    private static final int MOVIE_LOADER = 0;
+
+    private static final int MOVIE_POPULARITY_LOADER = 0;
+    private static final int MOVIE_RATING_LOADER = 1;
 
     private static final String[] MOVIE_PROJECTION = {
             MovieEntry._ID,
@@ -72,8 +73,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public Cursor mMoviesPopular;
 
     private MovieCursorAdapter movieAdapter;
-    private FetchMovieDataTask fetchPopularTask;
-    private FetchMovieDataTask fetchRatingTask;
 
     private String sortOrder;
 
@@ -126,7 +125,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIE_LOADER,null,this);
+        getLoaderManager().initLoader(MOVIE_POPULARITY_LOADER,null,this);
+        getLoaderManager().initLoader(MOVIE_RATING_LOADER,null,this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -146,11 +146,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             return true;
         }else if(id==R.id.action_refresh){
             //Set data to null and re-fetch
-            fetchRatingTask=null;
-            fetchPopularTask=null;
-            mMoviesPopular=null;
-            mMoviesRating=null;
-            updateAdapterWithSortOrder();
+            fetchMovieData();
             return true;
         }
 
@@ -184,12 +180,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         String sort = prefs.getString(prefSortKey, prefSortPopularity);
         sortOrder = sort;
 
-        //If sorts are null - fetch
-        if(mMoviesPopular==null || mMoviesRating==null) {
-            fetchMovieData();
-            return;
-        }
-
         //Set adapter data
         if(sort.equals(prefSortPopularity))
             movieAdapter.swapCursor(mMoviesPopular);
@@ -220,15 +210,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     public void fetchMovieData(){
         MoviesSyncAdapter.syncImmediately(getContext());
-        /*
-        if(fetchPopularTask==null)
-            fetchPopularTask=new FetchMovieDataTask(this.getContext(),this,movieAdapter);
-        fetchPopularTask.execute(fetchPopularity);
-
-        if(fetchRatingTask == null)
-            fetchRatingTask=new FetchMovieDataTask(this.getContext(),this,movieAdapter);
-        fetchRatingTask.execute(fetchRating);
-        */
     }
 
     /*
@@ -239,8 +220,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.w(LOG_TAG,"onCreateLoader");
         switch(id){
-            case MOVIE_LOADER:
+            case MOVIE_POPULARITY_LOADER:
                 return new CursorLoader(getActivity(),MovieEntry.CONTENT_URI,MOVIE_PROJECTION,null,null,MovieEntry.COLUMN_POPULARITY + " DESC");
+            case MOVIE_RATING_LOADER:
+                return new CursorLoader(getActivity(),MovieEntry.CONTENT_URI,MOVIE_PROJECTION,null,null,MovieEntry.COLUMN_VOTE_AVERAGE + " DESC");
             default:
                 return null;
         }
@@ -250,8 +233,13 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.w(LOG_TAG,"onLoadFinished");
         switch(loader.getId()){
-            case MOVIE_LOADER:
-                movieAdapter.swapCursor(data);
+            case MOVIE_POPULARITY_LOADER:
+                mMoviesPopular = data;
+                if(sortOrder.equals(prefSortPopularity)) movieAdapter.swapCursor(mMoviesPopular);
+                break;
+            case MOVIE_RATING_LOADER:
+                mMoviesRating = data;
+                if(sortOrder.equals(prefSortRating)) movieAdapter.swapCursor(mMoviesRating);
                 break;
         }
     }
@@ -259,8 +247,14 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         switch(loader.getId()){
-            case MOVIE_LOADER:
-                movieAdapter.swapCursor(null);
+            case MOVIE_POPULARITY_LOADER:
+                mMoviesPopular =null;
+                if(sortOrder.equals(prefSortPopularity)) movieAdapter.swapCursor(mMoviesPopular);
+                break;
+            case MOVIE_RATING_LOADER:
+                mMoviesRating = null;
+                if(sortOrder.equals(prefSortRating)) movieAdapter.swapCursor(mMoviesRating);
+                break;
         }
     }
 }
