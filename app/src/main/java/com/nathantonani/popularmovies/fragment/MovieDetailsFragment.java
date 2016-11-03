@@ -19,7 +19,13 @@ import android.widget.TextView;
 import com.nathantonani.popularmovies.R;
 import com.nathantonani.popularmovies.data.MoviesContract.MovieEntry;
 import com.nathantonani.popularmovies.model.Movie;
+import com.nathantonani.popularmovies.model.Review;
+import com.nathantonani.popularmovies.model.Trailer;
+import com.nathantonani.popularmovies.sync.extras.MovieExtrasProvider;
+import com.nathantonani.popularmovies.sync.extras.MovieExtrasProviderCallbacks;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -28,11 +34,13 @@ import butterknife.ButterKnife;
 /**
  * Created by ntonani on 9/12/16.
  */
-public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, MovieExtrasProviderCallbacks {
 
     private final String LOG_TAG = MovieDetailsFragment.class.getSimpleName();
     private static final int MOVIE_LOADER = 0;
+
     private Movie mMovieObject;
+    private MovieExtrasProvider mMovieExtras;
 
     @BindView(R.id.movieDetail_title) TextView movieTitle_view;
     @BindView(R.id.movieDetail_overview) TextView movieOverview_view;
@@ -81,6 +89,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         if(mMovieObject==null && savedInstanceState!=null && savedInstanceState.getParcelable(movieDetails_parcel)!=null)
             mMovieObject = savedInstanceState.getParcelable(movieDetails_parcel);
     */
+        mMovieExtras = MovieExtrasProvider.getInstance();
+        mMovieExtras.setBaseUrl(getString(R.string.movies_path_base));
         return rootView;
     }
 
@@ -126,6 +136,9 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                 Double.parseDouble(data.getString(COL_MOVIE_POPULARITY)), Double.parseDouble(data.getString(COL_MOVIE_VOTE_AVERAGE)),
                 data.getString(COL_MOVIE_POSTER_PATH));
 
+       // mMovieExtras.getReviewsForMovie(mMovieObject.getMovieId(),this);
+        mMovieExtras.getTrailersForMovie(mMovieObject.getMovieId(),this);
+
         //Add image
         try {
             Picasso.with(getActivity()).setIndicatorsEnabled(true);
@@ -152,4 +165,26 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
     }
 
+    /*
+     * MovieExtraProvider callback
+     */
+
+
+    @Override
+    public void onMovieTrailersLoaded(List<Trailer> trailers) {
+        if(trailers == null) Log.w(LOG_TAG, "Null trailers");
+        else {
+            for(Trailer trailer : trailers)
+                Log.w(LOG_TAG,trailer.getName());
+        }
+    }
+
+    @Override
+    public void onMovieReviewsLoaded(List<Review> reviews) {
+        if(reviews == null) Log.w(LOG_TAG,"Null reviews");
+        else {
+            for(Review review : reviews)
+                Log.w(LOG_TAG,review.getAuthor());
+        }
+    }
 }
