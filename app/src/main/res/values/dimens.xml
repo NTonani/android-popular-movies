@@ -7,4 +7,7 @@
     <dimen name="grid_image_view_movie_spacing">4dp</dimen>
     <dimen name="detail_view_rating_padding">20dp</dimen>
     <dimen name="detail_view_layout_margin">20dp</dimen>
+
+    <dimen name="anchor_height">1dp</dimen>
+    <dimen name="anchor_spacer">6dp</dimen>
 </resources>

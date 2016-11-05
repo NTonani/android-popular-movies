@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SectionAnchor">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">@dimen/anchor_height</item>
+        <item name="android:background">@color/colorAnchor</item>
+        <item name="android:layout_marginTop">@dimen/anchor_spacer</item>
+        <item name="android:layout_marginBottom">@dimen/anchor_spacer</item>
+    </style>
+
 </resources>

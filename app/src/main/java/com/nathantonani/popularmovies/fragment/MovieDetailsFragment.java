@@ -1,5 +1,6 @@
 package com.nathantonani.popularmovies.fragment;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import com.nathantonani.popularmovies.sync.extras.MovieExtrasProvider;
 import com.nathantonani.popularmovies.sync.extras.MovieExtrasProviderCallbacks;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindString;
@@ -42,12 +44,16 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     private Movie mMovieObject;
     private MovieExtrasProvider mMovieExtras;
 
+    private List<Trailer> mTrailers;
+    private List<Review> mReviews;
+
     @BindView(R.id.movieDetail_title) TextView movieTitle_view;
     @BindView(R.id.movieDetail_overview) TextView movieOverview_view;
     @BindView(R.id.movieDetail_releaseDate) TextView movieRelease_view;
     @BindView(R.id.movieDetail_rating) TextView movieRating_view;
     @BindView(R.id.movieDetail_thumbnail) ImageView movieThumbnail_view;
-
+    @BindView(R.id.detail_reviews_container) ViewGroup movieDetailReviews_view;
+    @BindView(R.id.detail_trailers_container) ViewGroup movieDetailTrailers_view;
     @BindString(R.string.movie_details_parcel) String movieDetails_parcel;
 
     private static final String[] MOVIE_PROJECTION = {
@@ -84,6 +90,9 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
         //Bind Butter Knife
         ButterKnife.bind(this,rootView);
+
+        mTrailers = new ArrayList<Trailer>();
+        mReviews = new ArrayList<Review>();
     /*
         //Check bundle state
         if(mMovieObject==null && savedInstanceState!=null && savedInstanceState.getParcelable(movieDetails_parcel)!=null)
@@ -136,7 +145,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                 Double.parseDouble(data.getString(COL_MOVIE_POPULARITY)), Double.parseDouble(data.getString(COL_MOVIE_VOTE_AVERAGE)),
                 data.getString(COL_MOVIE_POSTER_PATH));
 
-       // mMovieExtras.getReviewsForMovie(mMovieObject.getMovieId(),this);
+        mMovieExtras.getReviewsForMovie(mMovieObject.getMovieId(),this);
         mMovieExtras.getTrailersForMovie(mMovieObject.getMovieId(),this);
 
         //Add image
@@ -169,22 +178,58 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
      * MovieExtraProvider callback
      */
 
-
     @Override
     public void onMovieTrailersLoaded(List<Trailer> trailers) {
-        if(trailers == null) Log.w(LOG_TAG, "Null trailers");
-        else {
-            for(Trailer trailer : trailers)
-                Log.w(LOG_TAG,trailer.getName());
+        if(trailers == null) {
+            Log.w(LOG_TAG, "Null trailers");
+            return;
+        }
+        mTrailers = trailers;
+        final LayoutInflater inflater = LayoutInflater.from(getActivity());
+        for(Trailer trailer : mTrailers){
+            final View trailerItem = inflater.inflate(R.layout.detail_trailers_item,movieDetailTrailers_view,false);
+            final TextView trailerView = ButterKnife.findById(trailerItem,R.id.trailer_text);
+
+            trailerItem.setTag(trailer);
+            trailerView.setText(trailer.getName());
+
+            trailerItem.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.w(LOG_TAG,"onClick of view!");
+                    Trailer curTrailer = (Trailer) v.getTag();
+                    Intent youtubeApp = new Intent(Intent.ACTION_VIEW,Uri.parse("vnd.youtube:"+curTrailer.getSource()));
+                    Intent webApp = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+curTrailer.getSource()));
+
+                    try{
+                        startActivity(youtubeApp);
+                    }catch(ActivityNotFoundException e){
+                        startActivity(webApp);
+                    }
+                }
+            });
+
+            movieDetailTrailers_view.addView(trailerItem);
         }
     }
 
     @Override
     public void onMovieReviewsLoaded(List<Review> reviews) {
-        if(reviews == null) Log.w(LOG_TAG,"Null reviews");
-        else {
-            for(Review review : reviews)
-                Log.w(LOG_TAG,review.getAuthor());
+        if(reviews == null){
+            Log.w(LOG_TAG,"Null reviews");
+            return;
+        }
+        mReviews = reviews;
+        final LayoutInflater inflater = LayoutInflater.from(getActivity());
+        for(Review review : mReviews) {
+            final View reviewItem = inflater.inflate(R.layout.detail_reviews_item,movieDetailReviews_view,false);
+            final TextView authorView = ButterKnife.findById(reviewItem,R.id.review_author);
+            final TextView contentView = ButterKnife.findById(reviewItem,R.id.review_content);
+
+            authorView.setText(review.getAuthor());
+            contentView.setText(review.getContent());
+            movieDetailReviews_view.addView(reviewItem);
         }
     }
+
 }

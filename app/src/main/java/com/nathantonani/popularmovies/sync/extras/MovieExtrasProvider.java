@@ -53,22 +53,18 @@ public class MovieExtrasProvider {
         call.enqueue(new Callback<Trailers>(){
             @Override
             public void onResponse(Call<Trailers> call, Response<Trailers> response){
-                Log.w(LOG_TAG,"getTrailersForMovie onResponse response: " + response.message());
                 int statusCode = response.code();
-                Log.w(LOG_TAG,"getTrailersForMovie onResponse status: " + statusCode);
                 if(statusCode > 202) {
                     callback.onMovieTrailersLoaded(null);
                     return;
                 }
 
                 Trailers curTrailers = response.body();
-                Log.w(LOG_TAG,"Trailers ID: "+ curTrailers.getId());
                 callback.onMovieTrailersLoaded(curTrailers.getTrailers());
             }
 
             @Override
             public void onFailure(Call<Trailers> call, Throwable t){
-                Log.w(LOG_TAG,"Error fetching trailers: " + t.toString());
                 callback.onMovieTrailersLoaded(null);
             }
         });
@@ -88,22 +84,18 @@ public class MovieExtrasProvider {
 
             @Override
             public void onResponse(Call<Reviews> call, Response<Reviews> response) {
-                Log.w(LOG_TAG,"getReviewsForMovie onResponse response: " + response.message());
                 int statusCode = response.code();
-                Log.w(LOG_TAG,"getReviewsForMovie onResponse status: " + statusCode);
                 if(statusCode > 202){
                     callback.onMovieReviewsLoaded(null);
                     return;
                 }
 
                 Reviews curReviews = response.body();
-                Log.w(LOG_TAG,"Reviews ID: "+ curReviews.getId());
                 callback.onMovieReviewsLoaded(curReviews.getReviews());
             }
 
             @Override
             public void onFailure(Call<Reviews> call, Throwable t) {
-                Log.w(LOG_TAG,"Error fetching reviews: " + t.toString());
                 callback.onMovieReviewsLoaded(null);
             }
         });

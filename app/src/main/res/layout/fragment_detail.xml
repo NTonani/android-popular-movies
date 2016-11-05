@@ -64,6 +64,34 @@
             android:layout_alignParentLeft="true"
             android:paddingTop="@dimen/detail_view_layout_margin"/>
 
+        <View
+            android:id="@+id/movieDetail_anchor"
+            style="@style/SectionAnchor"
+            android:layout_below="@id/movieDetail_overview"/>
 
+        <LinearLayout
+            android:id="@+id/detail_reviews_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/movieDetail_anchor">
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/movieDetail_anchor_2"
+            style="@style/SectionAnchor"
+            android:layout_below="@id/detail_reviews_container"/>
+
+        <LinearLayout
+            android:id="@+id/detail_trailers_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/movieDetail_anchor_2">
+
+        </LinearLayout>
     </RelativeLayout>
+
+
 </ScrollView>
