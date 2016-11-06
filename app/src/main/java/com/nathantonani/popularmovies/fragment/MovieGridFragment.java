@@ -41,6 +41,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final int MOVIE_POPULARITY_LOADER = 0;
     private static final int MOVIE_RATING_LOADER = 1;
+    private static final int MOVIE_FAVORITES_LOADER = 2;
 
     private static final String[] MOVIE_PROJECTION = {
             MovieEntry._ID,
@@ -71,6 +72,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     */
     public Cursor mMoviesRating;
     public Cursor mMoviesPopular;
+    public Cursor mMoviesFavorite;
 
     private MovieCursorAdapter movieAdapter;
 
@@ -88,6 +90,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @BindString(R.string.pref_sort_key) String prefSortKey;
     @BindString(R.string.pref_sort_popularity) String prefSortPopularity;
     @BindString(R.string.pref_sort_rating) String prefSortRating;
+    @BindString(R.string.pref_sort_favorites) String prefSortFavorites;
 
     @BindString(R.string.movies_path_base) public String moviePathBase;
     /*
@@ -127,6 +130,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(MOVIE_POPULARITY_LOADER,null,this);
         getLoaderManager().initLoader(MOVIE_RATING_LOADER,null,this);
+        getLoaderManager().initLoader(MOVIE_FAVORITES_LOADER,null,this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -185,6 +189,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             movieAdapter.swapCursor(mMoviesPopular);
         else if(sort.equals(prefSortRating))
             movieAdapter.swapCursor(mMoviesRating);
+        else if(sort.equals(prefSortFavorites))
+            movieAdapter.swapCursor(mMoviesFavorite);
     }
 
     /*
@@ -224,6 +230,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
                 return new CursorLoader(getActivity(),MovieEntry.CONTENT_URI,MOVIE_PROJECTION,null,null,MovieEntry.COLUMN_POPULARITY + " DESC");
             case MOVIE_RATING_LOADER:
                 return new CursorLoader(getActivity(),MovieEntry.CONTENT_URI,MOVIE_PROJECTION,null,null,MovieEntry.COLUMN_VOTE_AVERAGE + " DESC");
+            case MOVIE_FAVORITES_LOADER:
+                return new CursorLoader(getActivity(),MovieEntry.CONTENT_URI_FAVORITES,MOVIE_PROJECTION,null,null,null);
             default:
                 return null;
         }
@@ -241,6 +249,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
                 mMoviesRating = data;
                 if(sortOrder.equals(prefSortRating)) movieAdapter.swapCursor(mMoviesRating);
                 break;
+            case MOVIE_FAVORITES_LOADER:
+                mMoviesFavorite = data;
+                if(sortOrder.equals(prefSortFavorites)) movieAdapter.swapCursor(mMoviesFavorite);
+                break;
         }
     }
 
@@ -254,6 +266,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             case MOVIE_RATING_LOADER:
                 mMoviesRating = null;
                 if(sortOrder.equals(prefSortRating)) movieAdapter.swapCursor(mMoviesRating);
+                break;
+            case MOVIE_FAVORITES_LOADER:
+                mMoviesFavorite = null;
+                if(sortOrder.equals(prefSortFavorites)) movieAdapter.swapCursor(mMoviesFavorite);
                 break;
         }
     }

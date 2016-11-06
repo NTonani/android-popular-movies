@@ -23,6 +23,8 @@ public class MoviesProvider extends ContentProvider {
 
     public static final int MOVIE = 100;
     public static final int MOVIE_ITEM = 101;
+    public static final int MOVIE_FAVORITES = 102;
+    public static final int MOVIE_FAVORITES_ITEM = 103;
 
     public static final int GENRE = 200;
     public static final int GENRE_ITEM = 201;
@@ -81,9 +83,11 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(authority, MoviesContract.PATH_MOVIE, MOVIE); //DIR
         matcher.addURI(authority, MoviesContract.PATH_GENRE ,GENRE); //DIR
         matcher.addURI(authority, MoviesContract.PATH_MOVIE_GENRES, MOVIE_GENRES); //DIR
+        matcher.addURI(authority,MoviesContract.PATH_FAVORITES,MOVIE_FAVORITES); //DIR
 
         matcher.addURI(authority, MoviesContract.PATH_MOVIE + "/#", MOVIE_ITEM); //ITEM
         matcher.addURI(authority, MoviesContract.PATH_GENRE + "/#", GENRE_ITEM); //ITEM
+        matcher.addURI(authority, MoviesContract.PATH_FAVORITES + "/#", MOVIE_FAVORITES_ITEM); //ITEM
 
         matcher.addURI(authority, MoviesContract.PATH_MOVIE_GENRES + "/" + MoviesContract.PATH_GENRE + "/#", MOVIES_OF_GENRE); //DIR
         matcher.addURI(authority, MoviesContract.PATH_MOVIE_GENRES + "/" + MoviesContract.PATH_MOVIE + "/#", GENRES_OF_MOVIE); //DIR
@@ -107,6 +111,10 @@ public class MoviesProvider extends ContentProvider {
                 break;
             case GENRE:
                 cursor = mDbHelper.getReadableDatabase().query(GenreEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+                break;
+            case MOVIE_FAVORITES:
+                cursor = mDbHelper.getReadableDatabase().query(MovieEntry.TABLE_NAME,projection,
+                        MovieEntry.COLUMN_FAVORITE + " = ?",new String[]{"1"},null,null,sortOrder);
                 break;
             case MOVIE_GENRES:
                 cursor = mDbHelper.getReadableDatabase().query(MovieGenresEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
@@ -265,11 +273,15 @@ public class MoviesProvider extends ContentProvider {
             case MOVIE_GENRES:
                 updatedRows = mDbHelper.getWritableDatabase().update(MovieGenresEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
-            case MOVIE_ITEM:
+            case MOVIE_ITEM: {
                 int movieId = MovieEntry.getMovieIdFromUri(uri);
-                updatedRows = mDbHelper.getWritableDatabase().update(MovieEntry.TABLE_NAME,values,MovieEntry.COLUMN_MOVIE_ID + " = ?",new String[]{movieId+""});
+                updatedRows = mDbHelper.getWritableDatabase().update(MovieEntry.TABLE_NAME, values, MovieEntry.COLUMN_MOVIE_ID + " = ?", new String[]{movieId + ""});
                 break;
-            default:
+            }case MOVIE_FAVORITES_ITEM: {
+                int movieId = MovieEntry.getMovieIdFromFavoritesUri(uri);
+                updatedRows = mDbHelper.getWritableDatabase().update(MovieEntry.TABLE_NAME, values, MovieEntry.COLUMN_MOVIE_ID + " = ?", new String[]{movieId + ""});
+                break;
+            }default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
 

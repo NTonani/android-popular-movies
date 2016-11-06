@@ -54,6 +54,15 @@
                 android:layout_below="@id/movieDetail_rating"
                 android:layout_toRightOf="@id/movieDetail_thumbnail"
                 android:textStyle="italic"/>
+
+            <ImageButton
+                android:id="@+id/movieDetail_favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/star_big_off"
+                android:layout_below="@id/movieDetail_releaseDate"
+                android:layout_toRightOf="@id/movieDetail_thumbnail"/>
+
         </LinearLayout>
 
         <TextView

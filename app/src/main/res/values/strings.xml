@@ -11,6 +11,7 @@
     <string name="pref_sort_key" translatable="false">sortOrder</string>
     <string name="pref_sort_popularity">Popularity</string>
     <string name="pref_sort_rating">Rating</string>
+    <string name="pref_sort_favorites">Favorites</string>
 
     <!-- Fetch url -->
     <string name="poster_path_base">http://image.tmdb.org/t/p</string>
@@ -29,5 +30,8 @@
     <!-- SyncAdapter -->
     <string name="sync_account_type">popularmovies.nathantonani.com</string>
     <string name="content_authority">com.nathantonani.popularmovies</string>
+
+    <!-- Favorites -->
+    <string name="favorites_set">favoriteMovies</string>
 
 </resources>

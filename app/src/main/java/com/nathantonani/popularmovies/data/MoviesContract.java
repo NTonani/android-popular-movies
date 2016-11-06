@@ -18,6 +18,7 @@ public class MoviesContract {
 
     public static final String PATH_GENRE = "genre";
     public static final String PATH_MOVIE = "movie";
+    public static final String PATH_FAVORITES = "favorites";
     public static final String PATH_MOVIE_GENRES = "movieGenres";
 
     public static final class GenreEntry implements BaseColumns{
@@ -53,6 +54,7 @@ public class MoviesContract {
     public static final class MovieEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+        public static final Uri CONTENT_URI_FAVORITES = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITES).build();
 
         public static final String CONTENT_DIR_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
@@ -72,6 +74,7 @@ public class MoviesContract {
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
         public static final String COLUMN_POSTER_PATH = "poster_path";
+        public static final String COLUMN_FAVORITE = "favorite";
 
         /*
          * URI builders
@@ -81,6 +84,9 @@ public class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
 
+        public static Uri buildMovieUriForFavorites(long id){
+            return ContentUris.withAppendedId(CONTENT_URI_FAVORITES,id);
+        }
         /*
          * URI parsers
          */
@@ -89,6 +95,9 @@ public class MoviesContract {
             return Integer.parseInt(uri.getPathSegments().get(1));
         }
 
+        public static int getMovieIdFromFavoritesUri(Uri uri){
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
     }
 
     public static final class MovieGenresEntry implements BaseColumns {

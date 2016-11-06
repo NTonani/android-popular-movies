@@ -13,7 +13,7 @@ import com.nathantonani.popularmovies.data.MoviesContract.MovieGenresEntry;
  */
 public class MoviesDatabase extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "movies.db";
 
@@ -33,6 +33,7 @@ public class MoviesDatabase extends SQLiteOpenHelper{
                 MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, "+
                 MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "+
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, "+
+                MovieEntry.COLUMN_FAVORITE + " BIT NOT NULL," +
                 "UNIQUE ("+MovieEntry.COLUMN_MOVIE_ID+") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_GENRE_TABLE = "CREATE TABLE " + GenreEntry.TABLE_NAME +" ("+

@@ -26,6 +26,7 @@ public class Movie implements Parcelable{
     private String title;
     private Double userRating;
     private Double popularity;
+    private boolean favorite;
 
     public Movie(JSONObject movieJson) throws JSONException{
 
@@ -39,7 +40,7 @@ public class Movie implements Parcelable{
 
     }
 
-    public Movie(int movieId, String title, String overview, String releaseDateString, Double popularity, Double userRating,String posterPath){
+    public Movie(int movieId, String title, String overview, String releaseDateString, Double popularity, Double userRating,String posterPath, int favorite){
 
         this.movieId = movieId;
         this.posterPath = posterPath;
@@ -48,7 +49,7 @@ public class Movie implements Parcelable{
         this.title = title;
         this.userRating = userRating;
         this.popularity = popularity;
-
+        this.favorite = favorite == 1;
     }
 
     /*
@@ -119,6 +120,10 @@ public class Movie implements Parcelable{
 
     public int getMovieId() {return movieId;}
 
+    public boolean getFavorite(){return favorite;}
+
+    public void setFavorite(boolean fav){this.favorite = fav;}
+
     @Override
     public String toString(){
         return this.title+" -- "+this.overview;
@@ -133,7 +138,12 @@ public class Movie implements Parcelable{
         cv.put(MovieEntry.COLUMN_POSTER_PATH,posterPath);
         cv.put(MovieEntry.COLUMN_POPULARITY,popularity);
         cv.put(MovieEntry.COLUMN_VOTE_AVERAGE,getUserRating());
-        cv.put(MovieEntry.COLUMN_ADULT,false);
+        return cv;
+    }
+
+    public ContentValues getFavoriteContentValue(){
+        ContentValues cv = new ContentValues();
+        cv.put(MovieEntry.COLUMN_FAVORITE,favorite ? 1 : 0);
         return cv;
     }
 

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ import java.util.List;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by ntonani on 9/12/16.
@@ -55,6 +57,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     @BindView(R.id.detail_reviews_container) ViewGroup movieDetailReviews_view;
     @BindView(R.id.detail_trailers_container) ViewGroup movieDetailTrailers_view;
     @BindString(R.string.movie_details_parcel) String movieDetails_parcel;
+    @BindView(R.id.movieDetail_favorites) ImageButton movieDetailsFavorites_view;
 
     private static final String[] MOVIE_PROJECTION = {
             MovieEntry._ID,
@@ -65,7 +68,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             MovieEntry.COLUMN_RELEASE_DATE,
             MovieEntry.COLUMN_POPULARITY,
             MovieEntry.COLUMN_VOTE_AVERAGE,
-            MovieEntry.COLUMN_POSTER_PATH
+            MovieEntry.COLUMN_POSTER_PATH,
+            MovieEntry.COLUMN_FAVORITE
     };
 
     public static final int COL_MOVIE_ID = 0;
@@ -77,6 +81,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     public static final int COL_MOVIE_POPULARITY = 6;
     public static final int COL_MOVIE_VOTE_AVERAGE = 7;
     public static final int COL_MOVIE_POSTER_PATH = 8;
+    public static final int COL_MOVIE_FAVORITES = 9;
 
     /*
      * Fragment lifecycle / callbacks
@@ -107,6 +112,12 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     public void onActivityCreated(@Nullable Bundle savedInstanceState){
         getLoaderManager().initLoader(MOVIE_LOADER,null,this);
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView(){
+        getActivity().getContentResolver().update(MovieEntry.buildMovieUriForFavorites(mMovieObject.getMovieId()),mMovieObject.getFavoriteContentValue(),null,null);
+        super.onDestroyView();
     }
 
     @Override
@@ -143,10 +154,14 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         mMovieObject = new Movie(data.getInt(COL_MOVIE_MOVIE_ID), data.getString(COL_MOVIE_TITLE),
                 data.getString(COL_MOVIE_OVERVIEW), data.getString(COL_MOVIE_RELEASE_DATE),
                 Double.parseDouble(data.getString(COL_MOVIE_POPULARITY)), Double.parseDouble(data.getString(COL_MOVIE_VOTE_AVERAGE)),
-                data.getString(COL_MOVIE_POSTER_PATH));
+                data.getString(COL_MOVIE_POSTER_PATH),data.getInt(COL_MOVIE_FAVORITES));
 
         mMovieExtras.getReviewsForMovie(mMovieObject.getMovieId(),this);
         mMovieExtras.getTrailersForMovie(mMovieObject.getMovieId(),this);
+
+        if(mMovieObject.getFavorite()){ // Change background
+            movieDetailsFavorites_view.setBackgroundResource(getResources().getIdentifier("@android:drawable/star_big_on",null,null));
+        }
 
         //Add image
         try {
@@ -229,6 +244,17 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             authorView.setText(review.getAuthor());
             contentView.setText(review.getContent());
             movieDetailReviews_view.addView(reviewItem);
+        }
+    }
+
+    @OnClick(R.id.movieDetail_favorites)
+    public void onClick(ImageButton view){
+        if(mMovieObject.getFavorite()){
+            mMovieObject.setFavorite(false);
+            view.setBackgroundResource(getResources().getIdentifier("@android:drawable/star_big_off",null,null));
+        }else{
+            mMovieObject.setFavorite(true);
+            view.setBackgroundResource(getResources().getIdentifier("@android:drawable/star_big_on",null,null));
         }
     }
 
