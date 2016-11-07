@@ -3,6 +3,7 @@ package com.nathantonani.popularmovies.fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import com.nathantonani.popularmovies.R;
-import com.nathantonani.popularmovies.activity.DetailActivity;
 import com.nathantonani.popularmovies.activity.SettingsActivity;
 import com.nathantonani.popularmovies.adapter.MovieCursorAdapter;
 import com.nathantonani.popularmovies.adapter.sync.MoviesSyncAdapter;
@@ -93,6 +93,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @BindString(R.string.pref_sort_favorites) String prefSortFavorites;
 
     @BindString(R.string.movies_path_base) public String moviePathBase;
+
+    public interface Callback {
+        public void onItemSelected(Uri movieUri);
+    }
     /*
      * Fragment lifecycle / callbacks
      */
@@ -203,10 +207,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         Cursor cursor = (Cursor)gridView.getItemAtPosition(position);
 
         if(cursor == null) return;
-
-        Intent intent = new Intent(getActivity(),DetailActivity.class);
-        intent.setData(MovieEntry.buildMovieUri(cursor.getInt(COL_MOVIE_MOVIE_ID)));
-        startActivity(intent);
+        Uri movieUri = MovieEntry.buildMovieUri(cursor.getInt(COL_MOVIE_MOVIE_ID));
+        ((Callback) getActivity()).onItemSelected(movieUri);
     }
 
 

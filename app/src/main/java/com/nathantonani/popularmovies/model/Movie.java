@@ -27,6 +27,7 @@ public class Movie implements Parcelable{
     private Double userRating;
     private Double popularity;
     private boolean favorite;
+    private boolean adult;
 
     public Movie(JSONObject movieJson) throws JSONException{
 
@@ -37,7 +38,7 @@ public class Movie implements Parcelable{
         this.userRating = movieJson.getDouble("vote_average");
         this.popularity = movieJson.getDouble("popularity");
         this.movieId = movieJson.getInt("id");
-
+        this.adult = movieJson.getBoolean("adult");
     }
 
     public Movie(int movieId, String title, String overview, String releaseDateString, Double popularity, Double userRating,String posterPath, int favorite){
@@ -138,6 +139,7 @@ public class Movie implements Parcelable{
         cv.put(MovieEntry.COLUMN_POSTER_PATH,posterPath);
         cv.put(MovieEntry.COLUMN_POPULARITY,popularity);
         cv.put(MovieEntry.COLUMN_VOTE_AVERAGE,getUserRating());
+        cv.put(MovieEntry.COLUMN_ADULT,adult ? 1 : 0);
         return cv;
     }
 

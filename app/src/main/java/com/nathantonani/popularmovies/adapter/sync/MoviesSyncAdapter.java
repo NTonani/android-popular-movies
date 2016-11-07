@@ -130,9 +130,10 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter{
 
                 if(movieCursor.moveToFirst())
                     contentResolver.update(movieItemUri, cv, null, null);
-                else
-                    contentResolver.insert(MoviesContract.MovieEntry.CONTENT_URI,cv);
-
+                else {
+                    cv.put(MoviesContract.MovieEntry.COLUMN_FAVORITE,0);
+                    contentResolver.insert(MoviesContract.MovieEntry.CONTENT_URI, cv);
+                }
                 movieCursor.close();
 
                 // TODO

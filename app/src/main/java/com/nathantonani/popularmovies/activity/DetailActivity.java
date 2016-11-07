@@ -32,6 +32,11 @@ public class DetailActivity extends AppCompatActivity {
         movieDetailsFragment = (MovieDetailsFragment)fm.findFragmentByTag(MovieDetailsFragment.class.getSimpleName());
         if(movieDetailsFragment==null){
             movieDetailsFragment = new MovieDetailsFragment();
+
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(MovieDetailsFragment.MOVIE_URI,getIntent().getData());
+            movieDetailsFragment.setArguments(arguments);
+
             fm.beginTransaction().add(R.id.container,movieDetailsFragment, MovieDetailsFragment.class.getSimpleName()).commit();
         }else
             movieDetailsFragment.getRetainInstance();

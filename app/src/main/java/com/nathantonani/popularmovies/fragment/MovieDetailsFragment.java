@@ -41,6 +41,8 @@ import butterknife.OnClick;
 public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, MovieExtrasProviderCallbacks {
 
     private final String LOG_TAG = MovieDetailsFragment.class.getSimpleName();
+
+    public static final String MOVIE_URI = "URI";
     private static final int MOVIE_LOADER = 0;
 
     private Movie mMovieObject;
@@ -110,13 +112,14 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState){
-        getLoaderManager().initLoader(MOVIE_LOADER,null,this);
+        getLoaderManager().initLoader(MOVIE_LOADER,getArguments(),this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onDestroyView(){
-        getActivity().getContentResolver().update(MovieEntry.buildMovieUriForFavorites(mMovieObject.getMovieId()),mMovieObject.getFavoriteContentValue(),null,null);
+        if(mMovieObject!=null)
+            getActivity().getContentResolver().update(MovieEntry.buildMovieUriForFavorites(mMovieObject.getMovieId()),mMovieObject.getFavoriteContentValue(),null,null);
         super.onDestroyView();
     }
 
@@ -137,11 +140,12 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
+
         Uri movieUri = null;
 
-        if(intent!=null)
-            movieUri = intent.getData();
+        if(args==null) return null;
+
+        movieUri = args.getParcelable(MOVIE_URI);
 
         Cursor movieCursor = getActivity().getContentResolver().query(movieUri,MOVIE_PROJECTION,null,null,null);
 
