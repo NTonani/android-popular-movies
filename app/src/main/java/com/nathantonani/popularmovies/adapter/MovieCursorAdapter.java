@@ -44,7 +44,6 @@ public class MovieCursorAdapter extends CursorAdapter{
 */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        Log.w(LOG_TAG,"newView! " + cursor.getPosition());
         View view = LayoutInflater.from(context).inflate(R.layout.fragment_main_image_view,parent,false);
 
         ViewHolder viewHolder = new ViewHolder(view);

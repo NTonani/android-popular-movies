@@ -1,7 +1,5 @@
 package com.nathantonani.popularmovies.sync.extras;
 
-import android.util.Log;
-
 import com.nathantonani.popularmovies.BuildConfig;
 import com.nathantonani.popularmovies.model.Review;
 import com.nathantonani.popularmovies.model.Reviews;
@@ -40,7 +38,7 @@ public class MovieExtrasProvider {
         API_KEY = BuildConfig.THE_MOVIE_DB_API_KEY;
     }
 
-    public void getTrailersForMovie(int movieId, final MovieExtrasProviderCallbacks callback){
+    public void getTrailersForMovie(final int movieId, final MovieExtrasProviderCallbacks callback){
         if(mTrailers.containsKey(movieId))
             callback.onMovieTrailersLoaded(mTrailers.get(movieId));
 
@@ -60,6 +58,7 @@ public class MovieExtrasProvider {
                 }
 
                 Trailers curTrailers = response.body();
+                mTrailers.put(movieId,curTrailers.getTrailers());
                 callback.onMovieTrailersLoaded(curTrailers.getTrailers());
             }
 
@@ -70,7 +69,7 @@ public class MovieExtrasProvider {
         });
     }
 
-    public void getReviewsForMovie(int movieId, final MovieExtrasProviderCallbacks callback){
+    public void getReviewsForMovie(final int movieId, final MovieExtrasProviderCallbacks callback){
         if(mReviews.containsKey(movieId))
             callback.onMovieReviewsLoaded(mReviews.get(movieId));
 
@@ -91,6 +90,7 @@ public class MovieExtrasProvider {
                 }
 
                 Reviews curReviews = response.body();
+                mReviews.put(movieId,curReviews.getReviews());
                 callback.onMovieReviewsLoaded(curReviews.getReviews());
             }
 
@@ -107,7 +107,6 @@ public class MovieExtrasProvider {
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BASE_URL).build();
         mMovieExtrasService = mRetrofit.create(MovieExtrasServiceInterface.class);
-        Log.w(LOG_TAG, mRetrofit.baseUrl().toString());
     }
 
     public static MovieExtrasProvider getInstance(){

@@ -225,7 +225,6 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             trailerItem.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.w(LOG_TAG,"onClick of view!");
                     Trailer curTrailer = (Trailer) v.getTag();
                     Intent youtubeApp = new Intent(Intent.ACTION_VIEW,Uri.parse("vnd.youtube:"+curTrailer.getSource()));
                     Intent webApp = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+curTrailer.getSource()));
