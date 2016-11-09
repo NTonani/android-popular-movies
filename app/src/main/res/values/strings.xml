@@ -34,4 +34,11 @@
     <!-- Favorites -->
     <string name="favorites_set">favoriteMovies</string>
 
+    <!-- Placeholder text -->
+    <string name="movie_placeholder">Please choose a movie</string>
+
+    <!-- Header text -->
+    <string name="movieReviews_header">REVIEWS</string>
+    <string name="movieTrailers_header">TRAILERS</string>
+
 </resources>

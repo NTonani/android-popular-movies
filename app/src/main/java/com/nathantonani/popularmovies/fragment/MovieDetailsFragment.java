@@ -112,16 +112,22 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState){
-        getLoaderManager().initLoader(MOVIE_LOADER,getArguments(),this);
+        Bundle movieBundle = getArguments();
+        if(movieBundle==null)
+            movieTitle_view.setText(R.string.movie_placeholder);
+        else
+            getLoaderManager().initLoader(MOVIE_LOADER,movieBundle,this);
         super.onActivityCreated(savedInstanceState);
     }
 
+    /*
     @Override
     public void onDestroyView(){
         if(mMovieObject!=null)
             getActivity().getContentResolver().update(MovieEntry.buildMovieUriForFavorites(mMovieObject.getMovieId()),mMovieObject.getFavoriteContentValue(),null,null);
         super.onDestroyView();
     }
+    */
 
     @Override
     public void onSaveInstanceState(Bundle outState){
@@ -166,6 +172,10 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         if(mMovieObject.getFavorite()){ // Change background
             movieDetailsFavorites_view.setBackgroundResource(getResources().getIdentifier("@android:drawable/star_big_on",null,null));
         }
+
+        movieDetailsFavorites_view.setVisibility(View.VISIBLE);
+        movieDetailTrailers_view.setVisibility(View.VISIBLE);
+        movieDetailReviews_view.setVisibility(View.VISIBLE);
 
         //Add image
         try {
@@ -260,6 +270,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             mMovieObject.setFavorite(true);
             view.setBackgroundResource(getResources().getIdentifier("@android:drawable/star_big_on",null,null));
         }
+
+        getActivity().getContentResolver().update(MovieEntry.buildMovieUriForFavorites(mMovieObject.getMovieId()),mMovieObject.getFavoriteContentValue(),null,null);
     }
 
 }

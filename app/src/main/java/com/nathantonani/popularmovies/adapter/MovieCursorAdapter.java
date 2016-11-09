@@ -57,8 +57,8 @@ public class MovieCursorAdapter extends CursorAdapter{
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        String url = cursor.getString(MovieGridFragment.COL_MOVIE_POSTER_PATH);// TODO continue
 
+        String url = cursor.getString(MovieGridFragment.COL_MOVIE_POSTER_PATH);// TODO continue
         //Load thumbnail into image view item
         try {
             Picasso.with(context).setIndicatorsEnabled(true);
