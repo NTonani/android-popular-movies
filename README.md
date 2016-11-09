@@ -1,11 +1,15 @@
 ##Popular Movies
 
-Stage 1/2 of the Popular Movies app, created for the Android Developer Nanodegree program. 
+Stage 2/2 of the Popular Movies app, created for the Android Developer Nanodegree program. 
 
 ##Features
 
-* View list of most popular, and highest rated movies according to The Movie Database
+* View lists of most popular, and highest rated movies according to The Movie Database
 * View details of movies
+* Favorite movies and filter by favorited movies
+* View trailers and read reviews
+* Tablet support
+* Data persistence for offline mode support
 
 ##Instructions
 
