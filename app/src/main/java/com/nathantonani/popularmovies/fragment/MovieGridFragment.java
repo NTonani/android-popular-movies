@@ -47,28 +47,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             MovieEntry.COLUMN_MOVIE_ID,
             MovieEntry.COLUMN_POSTER_PATH
     };
-            /*
-            MovieEntry.COLUMN_TITLE,
-            MovieEntry.COLUMN_OVERVIEW,
-            MovieEntry.COLUMN_ADULT,
-            MovieEntry.COLUMN_RELEASE_DATE,
-            MovieEntry.COLUMN_POPULARITY,
-            MovieEntry.COLUMN_VOTE_AVERAGE,
-            MovieEntry.COLUMN_POSTER_PATH
-    };*/
+
 
     public static final int COL_MOVIE_ID = 0;
     public static final int COL_MOVIE_MOVIE_ID = 1;
     public static final int COL_MOVIE_POSTER_PATH = 2;
-    /*
-    public static final int COL_MOVIE_TITLE = 2;
-    public static final int COL_MOVIE_OVERVIEW = 3;
-    public static final int COL_MOVIE_ADULT = 4;
-    public static final int COL_MOVIE_RELEASE_DATE = 5;
-    public static final int COL_MOVIE_POPULARITY = 6;
-    public static final int COL_MOVIE_VOTE_AVERAGE = 7;
-    public static final int COL_MOVIE_POSTER_PATH = 8;
-    */
+
     public Cursor mMoviesRating;
     public Cursor mMoviesPopular;
     public Cursor mMoviesFavorite;
@@ -113,17 +97,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         movieAdapter = new MovieCursorAdapter(getContext(),null, 0);
         sortOrder = fetchPopularity;
 
-        /*
-        if(savedInstanceState==null)
-            sortOrder = fetchPopularity;
-        else{
-            //Get bundled content
-            mMoviesPopular = savedInstanceState.getParcelable(fetchPopularityVar);
-            mMoviesRating = savedInstanceState.getParcelable(fetchRatingVar);
-            sortOrder = savedInstanceState.getString(prefSortKey);
-        }
-        */
-
         //Attach adapter to Grid View with click listener
         gridView.setAdapter(movieAdapter);
         return rootView;
@@ -158,17 +131,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState){
-        /*
-        //Save current sort lists and current sort
-        outState.putParcelableArrayList(fetchRatingVar,(ArrayList<Movie>)mMoviesPopular);
-        outState.putParcelableArrayList(fetchPopularityVar,(ArrayList<Movie>)mMoviesRating);
-        outState.putString(prefSortKey,sortOrder);
-        */
-        super.onSaveInstanceState(outState);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class Movie implements Parcelable{
         this.adult = movieJson.getBoolean("adult");
     }
 
-    public Movie(int movieId, String title, String overview, String releaseDateString, Double popularity, Double userRating,String posterPath, int favorite){
+    public Movie(int movieId, String title, String overview, String releaseDateString, Double popularity, Double userRating,String posterPath, int favorite, int adult){
 
         this.movieId = movieId;
         this.posterPath = posterPath;
@@ -51,6 +51,7 @@ public class Movie implements Parcelable{
         this.userRating = userRating;
         this.popularity = popularity;
         this.favorite = favorite == 1;
+        this.adult = adult == 1;
     }
 
     /*
@@ -70,12 +71,15 @@ public class Movie implements Parcelable{
     };
 
     public Movie(Parcel in){
+        this.movieId = in.readInt();
         this.posterPath = urlBase+picWidthLarge+in.readString();
         this.overview = in.readString();
         this.releaseDateString = in.readString();
         this.title = in.readString();
         this.userRating = in.readDouble();
         this.popularity = in.readDouble();
+        this.favorite = in.readInt() == 1;
+        this.adult = in.readInt() == 1;
     }
 
     @Override
@@ -85,12 +89,15 @@ public class Movie implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.movieId);
         dest.writeString(this.posterPath);
         dest.writeString(this.overview);
         dest.writeString(this.releaseDateString);
         dest.writeString(this.title);
         dest.writeDouble(this.userRating);
         dest.writeDouble(this.popularity);
+        dest.writeInt(this.favorite ? 1 : 0);
+        dest.writeInt(this.adult ? 1 : 0);
     }
 
     /*

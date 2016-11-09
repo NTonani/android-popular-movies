@@ -100,6 +100,8 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter{
             //Final json
             movieJsonString = buffer.toString();
 
+            Log.w(LOG_TAG,movieJsonString);
+
         }catch(Exception e){
             Log.e(LOG_TAG,"Error fetching data: "+e.toString());
         }finally {

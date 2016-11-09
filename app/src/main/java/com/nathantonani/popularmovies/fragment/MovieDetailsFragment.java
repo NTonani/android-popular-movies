@@ -1,6 +1,8 @@
 package com.nathantonani.popularmovies.fragment;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -51,6 +53,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     private List<Trailer> mTrailers;
     private List<Review> mReviews;
 
+    private Context mContext;
+
     @BindView(R.id.movieDetail_title) TextView movieTitle_view;
     @BindView(R.id.movieDetail_overview) TextView movieOverview_view;
     @BindView(R.id.movieDetail_releaseDate) TextView movieRelease_view;
@@ -100,11 +104,11 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
         mTrailers = new ArrayList<Trailer>();
         mReviews = new ArrayList<Review>();
-    /*
+
         //Check bundle state
         if(mMovieObject==null && savedInstanceState!=null && savedInstanceState.getParcelable(movieDetails_parcel)!=null)
             mMovieObject = savedInstanceState.getParcelable(movieDetails_parcel);
-    */
+
         mMovieExtras = MovieExtrasProvider.getInstance();
         mMovieExtras.setBaseUrl(getString(R.string.movies_path_base));
         return rootView;
@@ -112,30 +116,25 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState){
-        Bundle movieBundle = getArguments();
-        if(movieBundle==null)
-            movieTitle_view.setText(R.string.movie_placeholder);
-        else
-            getLoaderManager().initLoader(MOVIE_LOADER,movieBundle,this);
+
+        if(mMovieObject!=null)
+            updateUI();
+        else {
+            Bundle movieBundle = getArguments();
+            if (movieBundle == null)
+                movieTitle_view.setText(R.string.movie_placeholder);
+            else
+                getLoaderManager().initLoader(MOVIE_LOADER, movieBundle, this);
+        }
         super.onActivityCreated(savedInstanceState);
     }
 
-    /*
-    @Override
-    public void onDestroyView(){
-        if(mMovieObject!=null)
-            getActivity().getContentResolver().update(MovieEntry.buildMovieUriForFavorites(mMovieObject.getMovieId()),mMovieObject.getFavoriteContentValue(),null,null);
-        super.onDestroyView();
-    }
-    */
-
     @Override
     public void onSaveInstanceState(Bundle outState){
-        /*
+
         //Store bundle data
         if(mMovieObject!=null)
             outState.putParcelable(movieDetails_parcel,mMovieObject);
-        */
 
         super.onSaveInstanceState(outState);
     }
@@ -164,7 +163,14 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         mMovieObject = new Movie(data.getInt(COL_MOVIE_MOVIE_ID), data.getString(COL_MOVIE_TITLE),
                 data.getString(COL_MOVIE_OVERVIEW), data.getString(COL_MOVIE_RELEASE_DATE),
                 Double.parseDouble(data.getString(COL_MOVIE_POPULARITY)), Double.parseDouble(data.getString(COL_MOVIE_VOTE_AVERAGE)),
-                data.getString(COL_MOVIE_POSTER_PATH),data.getInt(COL_MOVIE_FAVORITES));
+                data.getString(COL_MOVIE_POSTER_PATH),data.getInt(COL_MOVIE_FAVORITES), data.getInt(COL_MOVIE_ADULT));
+
+        updateUI();
+
+    }
+
+    public void updateUI(){
+        if(mMovieObject == null) return;
 
         mMovieExtras.getReviewsForMovie(mMovieObject.getMovieId(),this);
         mMovieExtras.getTrailersForMovie(mMovieObject.getMovieId(),this);
@@ -195,7 +201,6 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
         //Add rating
         movieRating_view.setText("User Rating: "+mMovieObject.getUserRating()); //TODO: Resource string with placeholder
-
     }
 
     @Override
@@ -214,7 +219,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             return;
         }
         mTrailers = trailers;
-        final LayoutInflater inflater = LayoutInflater.from(getActivity());
+        final LayoutInflater inflater = LayoutInflater.from(mContext);
         for(Trailer trailer : mTrailers){
             final View trailerItem = inflater.inflate(R.layout.detail_trailers_item,movieDetailTrailers_view,false);
             final TextView trailerView = ButterKnife.findById(trailerItem,R.id.trailer_text);
@@ -247,8 +252,9 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             Log.w(LOG_TAG,"Null reviews");
             return;
         }
+
         mReviews = reviews;
-        final LayoutInflater inflater = LayoutInflater.from(getActivity());
+        final LayoutInflater inflater = LayoutInflater.from(mContext);
         for(Review review : mReviews) {
             final View reviewItem = inflater.inflate(R.layout.detail_reviews_item,movieDetailReviews_view,false);
             final TextView authorView = ButterKnife.findById(reviewItem,R.id.review_author);
@@ -258,6 +264,12 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             contentView.setText(review.getContent());
             movieDetailReviews_view.addView(reviewItem);
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mContext = activity;
     }
 
     @OnClick(R.id.movieDetail_favorites)
