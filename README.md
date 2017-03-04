@@ -1,6 +1,6 @@
 ##Popular Movies
 
-Stage 2/2 of the Popular Movies app, created for the Android Developer Nanodegree program. 
+Stage 2/2 of the Popular Movies app, created for the Android Developer Nanodegree program. This app was developed without Material Design, and with an emphasis on non-ui patterns.
 
 ##Features
 
